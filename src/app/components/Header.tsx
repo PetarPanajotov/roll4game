@@ -1,7 +1,8 @@
 'use client'
 
+import { getTwitchToken } from '@/lib/twitchToken'
 import Link from 'next/link'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 const links = [
   { href: '/', label: 'Home' },
