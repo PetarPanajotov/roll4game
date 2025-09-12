@@ -5,6 +5,8 @@ export const dynamic = 'force-dynamic' // always render on server
 export default async function RandomPage() {
   const game = await getRandomGame()
 
+  console.log(game)
+
   if (!game) {
     return (
       <main className="max-w-2xl mx-auto p-6">
