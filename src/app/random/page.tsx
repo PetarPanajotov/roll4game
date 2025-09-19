@@ -1,11 +1,12 @@
-import { getRandomGame, igdbCoverUrl } from '@/lib/igdb'
+import { fetchGameCoverById, getRandomGame } from '@/lib/igdb'
 export const revalidate = 0 // no caching
 export const dynamic = 'force-dynamic' // always render on server
 
 export default async function RandomPage() {
   const game = await getRandomGame()
 
-  console.log(game)
+  const cover = await fetchGameCoverById(game!.cover!)
+  console.log(cover)
 
   if (!game) {
     return (
@@ -21,11 +22,6 @@ export default async function RandomPage() {
     )
   }
 
-  const cover =
-    typeof game.cover === 'object' && game.cover?.image_id
-      ? igdbCoverUrl(game.cover.image_id, 'cover_big')
-      : null
-
   return (
     <main className="max-w-2xl mx-auto p-6">
       <h1 className="text-2xl font-semibold mb-4">Random Game</h1>
@@ -34,7 +30,7 @@ export default async function RandomPage() {
         <header className="flex gap-4 items-start">
           {cover && (
             <img
-              src={cover}
+              src={cover.url}
               alt={`${game.name} cover`}
               className="w-32 h-44 object-cover rounded"
             />
