@@ -91,7 +91,7 @@ export async function fetchGameCoverById(coverId: number): Promise<IgdbCover> {
       throw new Error(`IGDB cover fetch failed: ${res.status} ${text}`)
     }
 
-    const data: any[] = await res.json()
+    const data: IgdbCover[] = await res.json()
     const cover = data?.[0] ?? null
 
     if (cover?.url) {
