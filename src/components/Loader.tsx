@@ -73,8 +73,15 @@ export default function GlobalLoader() {
   }
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-900">
-      <div className="perspective-1000">
+    <div className="fixed inset-0 flex items-center justify-center min-h-screen z-50">
+      {/* Backdrop */}
+      <div className="absolute inset-0 bg-black/30 backdrop-blur-sm z-0"></div>
+
+      {/* Cube wrapper */}
+      <div className="perspective-1000 relative z-10 flex flex-col items-center space-y-6">
+        <h1 className="text-white font-bold text-[2rem] animate-pulse pb-5">
+          Looking for game...
+        </h1>
         <div
           className="w-24 h-24 relative"
           style={{
