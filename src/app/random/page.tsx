@@ -1,25 +1,33 @@
-import { fetchGameCoverById, getRandomGame } from '@/lib/igdb'
-export const revalidate = 0 // no caching
-export const dynamic = 'force-dynamic' // always render on server
+'use client'
+import { Game } from '@/types/game.types'
+import { Suspense, useEffect, useState } from 'react'
+import Loading from './loading'
 
-export default async function RandomPage() {
-  const game = await getRandomGame()
+export default function RandomPage() {
+  const [game, setGame] = useState<Game | null>(null)
+  const [isLoading, setLoading] = useState<boolean>(false)
 
-  const cover = await fetchGameCoverById(game!.cover!)
-  console.log(cover)
+  const fetchgame = async () => {
+    setLoading(true)
+    return await fetch('/api/random-game', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+      .then((res) => res.json())
+      .then((data: Game) => {
+        setGame(data)
+        setLoading(false)
+      })
+  }
 
-  if (!game) {
-    return (
-      <main className="max-w-2xl mx-auto p-6">
-        <h1 className="text-2xl font-semibold mb-4">Random Game</h1>
-        <p>Couldn’t find a game. Try again.</p>
-        <form>
-          <button formAction="" className="mt-4 px-4 py-2 rounded border">
-            Try again
-          </button>
-        </form>
-      </main>
-    )
+  useEffect(() => {
+    fetchgame()
+  }, [])
+
+  if (isLoading || !game) {
+    return <Loading />
   }
 
   return (
@@ -28,9 +36,9 @@ export default async function RandomPage() {
 
       <article className="rounded-2xl border p-4 shadow-sm">
         <header className="flex gap-4 items-start">
-          {cover && (
+          {game.cover && (
             <img
-              src={cover.url}
+              src={game?.cover.url}
               alt={`${game.name} cover`}
               className="w-32 h-44 object-cover rounded"
             />
@@ -60,7 +68,7 @@ export default async function RandomPage() {
 
       {/* Simple reload (server re-render) */}
       <form>
-        <button formAction="" className="mt-6 px-4 py-2 rounded border">
+        <button onClick={fetchgame} className="mt-6 px-4 py-2 rounded border">
           Pick another
         </button>
       </form>

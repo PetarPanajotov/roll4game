@@ -8,10 +8,18 @@ const IGDB_COVERENDPOINT = 'https://api.igdb.com/v4/covers'
 type IgdbGame = {
   id: number
   name: string
-  cover?: string | number
+  cover?: number
   first_release_date?: number
   summary?: string
   url?: string
+}
+
+type IgdbCover = {
+  height: number
+  id: number
+  image_id: string
+  width: number
+  url: string
 }
 
 async function igdbGamesRequest(query: string): Promise<Response> {
@@ -64,10 +72,7 @@ async function fetchOneAt(offset: number): Promise<IgdbGame | null> {
   return data?.[0] ?? null
 }
 
-export async function fetchGameCoverById(
-  coverId: string | number | undefined
-): Promise<any | null> {
-  if (coverId === undefined) return null
+export async function fetchGameCoverById(coverId: number): Promise<IgdbCover> {
   const token = await getTwitchToken()
 
   try {
