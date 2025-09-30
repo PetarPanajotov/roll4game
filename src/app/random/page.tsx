@@ -2,6 +2,7 @@
 import { Game } from '@/types/game.types'
 import { Suspense, useEffect, useState } from 'react'
 import Loading from './loading'
+import Image from 'next/image'
 import React from 'react'
 
 export default function RandomPage() {
@@ -37,10 +38,11 @@ export default function RandomPage() {
           <article className="rounded-2xl border p-4 shadow-sm">
             <header className="flex gap-4 items-start">
               {game.cover && (
-                <img
+                <Image
                   src={game?.cover.url}
                   alt={`${game.name} cover`}
-                  className="w-32 h-44 object-cover rounded"
+                  width={200}
+                  height={150}
                 />
               )}
               <div>
