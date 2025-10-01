@@ -4,7 +4,7 @@ import { Suspense, useEffect, useState } from 'react'
 import Loading from './loading'
 import Image from 'next/image'
 import React from 'react'
-import { Card, CardBody, CardHeader } from '@/components/ui/card.'
+import { Card, CardBody, CardHeader } from '@/components/ui/card'
 
 export default function RandomPage() {
   const [game, setGame] = useState<Game | null>(null)
