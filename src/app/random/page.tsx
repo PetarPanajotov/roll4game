@@ -4,6 +4,7 @@ import { Suspense, useEffect, useState } from 'react'
 import Loading from './loading'
 import Image from 'next/image'
 import React from 'react'
+import { Card, CardBody, CardHeader } from '@/components/ui/card.'
 
 export default function RandomPage() {
   const [game, setGame] = useState<Game | null>(null)
@@ -32,10 +33,21 @@ export default function RandomPage() {
     <React.Fragment>
       {isLoading && <Loading />}
       <main className="max-w-2xl mx-auto p-6">
-        <h1 className="text-2xl font-semibold mb-4">Random Game</h1>
+        <Card>
+          <CardHeader>
+            <h1 className="text-2xl font-semibold text-center mb-4">
+              Random Game Picker
+            </h1>
+          </CardHeader>
+          <CardBody>
+            <p>Test</p>
+          </CardBody>
+        </Card>
 
         {game && (
-          <article className="rounded-2xl border p-4 shadow-sm">
+          <div
+            className={`bg-card rounded-2xl border p-4 shadow-sm bg-cover bg-center bg-no-repeat`}
+          >
             <header className="flex gap-4 items-start">
               {game.cover && (
                 <Image
@@ -66,10 +78,8 @@ export default function RandomPage() {
             </header>
 
             {game.summary && <p className="mt-4">{game.summary}</p>}
-          </article>
+          </div>
         )}
-
-        {/* Simple reload (server re-render) */}
         <button onClick={fetchgame} className="mt-6 px-4 py-2 rounded border">
           Pick another
         </button>
