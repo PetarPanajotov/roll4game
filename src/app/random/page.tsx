@@ -6,6 +6,7 @@ import Image from 'next/image'
 import React from 'react'
 import { Card, CardBody, CardHeader } from '@/components/ui/card'
 import { TagSelectInput } from '@/components/ui/tag-select-input'
+import { Label } from '@/components/ui/label'
 
 export default function RandomPage() {
   const [game, setGame] = useState<Game | null>(null)
@@ -41,6 +42,7 @@ export default function RandomPage() {
             </h1>
           </CardHeader>
           <CardBody>
+            <Label>Platform</Label>
             <TagSelectInput />
           </CardBody>
         </Card>
