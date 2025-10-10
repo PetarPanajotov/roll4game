@@ -90,7 +90,7 @@ export function TagSelectInput() {
           inputRef.current?.focus()
         },
         className:
-          'border-[1] rounded-xl px-4 py-2 relative hover:border-fuchsia-700',
+          'border-[1] rounded-xl px-4 py-2 relative focus-within:border-white',
       })}
     >
       <div className="h-full flex flex-row flex-12">
