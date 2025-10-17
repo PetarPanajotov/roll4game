@@ -9,8 +9,8 @@ interface DropdownMenuProps {
     props?: React.HTMLProps<HTMLElement> | undefined
   ) => Record<string, unknown>
   isOpen: boolean
-  options: string[]
-  onSelect: (value: string) => void
+  options: { text: string; value?: string | number | object }[]
+  onSelect: (value: string | number | object) => void
   onClose: () => void
 }
 
@@ -73,7 +73,8 @@ export function DropdownMenu(props: DropdownMenuProps) {
           break
         case 'Enter':
           e.preventDefault()
-          onSelect(options[cursor])
+          /* Set value at given index if present, otherwise set the text as value */
+          onSelect(options[cursor].value ?? options[cursor].text)
           break
         case 'Escape':
           e.preventDefault()
@@ -103,7 +104,7 @@ export function DropdownMenu(props: DropdownMenuProps) {
       >
         <div className="min-h-26 max-h-32 w-full overflow-auto">
           <ul role="listbox">
-            {options.map((_, i) => (
+            {options.map((option, i) => (
               <li
                 ref={(el) => {
                   if (el) itemRefs.current[i] = el
@@ -114,6 +115,9 @@ export function DropdownMenu(props: DropdownMenuProps) {
                     setCursor(i)
                   })
                 }}
+                onClick={() =>
+                  onSelect(options[cursor].value ?? options[cursor].text)
+                }
                 key={i}
                 id={`option-${i}`}
                 role="option"
@@ -122,7 +126,7 @@ export function DropdownMenu(props: DropdownMenuProps) {
                   i === cursor ? 'bg-secondary' : ''
                 }`}
               >
-                PC (Microsoft Windows)
+                {option.text}
               </li>
             ))}
           </ul>

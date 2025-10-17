@@ -15,8 +15,9 @@ import { useEffect, useRef, useState } from 'react'
 import { DropdownMenu } from './dropdown-menu'
 
 export function TagSelectInput() {
-  const [value, setValue] = useState('')
+  const [displayValue, setDisplayValue] = useState<string>('')
   const [isOpen, setIsOpen] = useState(false)
+  const [tags, setTags] = useState<string[]>([])
 
   const inputRef = useRef<HTMLInputElement>(null)
   const span = useRef<HTMLSpanElement>(null)
@@ -25,7 +26,7 @@ export function TagSelectInput() {
       /** Here we update the input width directly to improve the performance. This way we have less rerenders. */
       inputRef.current.style.width = `${span.current.offsetWidth}px`
     }
-  }, [value])
+  }, [displayValue])
 
   const { refs, floatingStyles, context } = useFloating({
     open: isOpen,
@@ -59,19 +60,6 @@ export function TagSelectInput() {
     role,
   ])
 
-  function handleKeyDown(event: React.KeyboardEvent<HTMLInputElement>) {
-    console.log('here')
-    if (event.key === 'ArrowDown') {
-      event.preventDefault()
-      setIsOpen(true)
-      // Dropdown will handle cursor internally
-    } else if (event.key === 'ArrowUp') {
-      event.preventDefault()
-      setIsOpen(true)
-      // Dropdown will handle cursor internally
-    }
-  }
-
   return (
     <div
       ref={refs.setReference}
@@ -80,46 +68,39 @@ export function TagSelectInput() {
           inputRef.current?.focus()
         },
         className:
-          'border-[1] rounded-xl px-4 py-2 relative focus-within:border-white',
+          'border-[1] rounded-xl px-1 py-2 relative focus-within:border-white',
       })}
     >
       <div className="h-full flex flex-row flex-12">
         <span className="opacity-0 absolute whitespace-pre" ref={span}>
-          {value}
+          {displayValue}
         </span>
-        {!value && (
+        {!displayValue && tags.length === 0 && (
           <span className="align-middle opacity-25 absolute top-6/12 -translate-y-6/12">
             Select platforms...
           </span>
         )}
-        <div>{/* <span>Tag</span> */}</div>
+        <div>
+          <Tag
+            tags={tags}
+            removeTag={(indexToRemove: number) =>
+              setTags(tags.filter((_, index) => index !== indexToRemove))
+            }
+          />
+        </div>
         <input
           ref={inputRef}
           type="text"
-          value={value}
-          onChange={(e) => setValue(e.target.value)}
+          value={displayValue}
+          onChange={(e) => setDisplayValue(e.target.value)}
           className="h-12/12 border-0 outline-0 w-full min-w-[4.1] "
         ></input>
       </div>
       {isOpen && (
         <DropdownMenu
-          options={[
-            'test1',
-            'test2',
-            'test3',
-            'test4',
-            'test5',
-            'test6',
-            'test7',
-            'test8',
-            'test9',
-            'test10',
-            'test11',
-            'test12',
-            'test13',
-          ]}
+          options={[{ text: 'test1', value: 'test545' }]}
           onSelect={(opt) => {
-            setValue(opt)
+            setTags([...tags, opt as string])
             setIsOpen(false)
             inputRef.current?.focus()
           }}
@@ -131,5 +112,35 @@ export function TagSelectInput() {
         />
       )}
     </div>
+  )
+}
+
+function Tag(props: { tags: string[]; removeTag: (index: number) => void }) {
+  const { tags, removeTag } = props
+
+  const handleRemoveTag = (event: React.MouseEvent, i: number) => {
+    event.preventDefault()
+    event.stopPropagation()
+    removeTag(i)
+  }
+
+  return (
+    <>
+      {tags.map((tag, i) => (
+        <span
+          className={`bg-blue-500 rounded-xl px-1.5 py-1.5 ${
+            i !== 0 && 'ms-1'
+          }`}
+        >
+          {tag}
+          <span
+            className="text-[12px] ps-1"
+            onClick={(event) => handleRemoveTag(event, i)}
+          >
+            &#10005;
+          </span>
+        </span>
+      ))}
+    </>
   )
 }
