@@ -13,20 +13,55 @@ import {
 } from '@floating-ui/react'
 import { useEffect, useRef, useState } from 'react'
 import { DropdownMenu } from './dropdown-menu'
+import { ChevronDown } from 'lucide-react'
 
 export function TagSelectInput() {
   const [displayValue, setDisplayValue] = useState<string>('')
   const [isOpen, setIsOpen] = useState(false)
   const [tags, setTags] = useState<string[]>([])
+  const [visibleTags, setVisibleTags] = useState<number>(tags.length)
 
   const inputRef = useRef<HTMLInputElement>(null)
   const span = useRef<HTMLSpanElement>(null)
+  const containerRef = useRef<HTMLDivElement>(null)
+  const tagsContainerRef = useRef<HTMLDivElement>(null)
+
   useEffect(() => {
     if (span.current && inputRef.current) {
       /** Here we update the input width directly to improve the performance. This way we have less rerenders. */
       inputRef.current.style.width = `${span.current.offsetWidth}px`
     }
   }, [displayValue])
+
+  /* Calculate the width of the input and replace the tags with +1 More etc. */
+  useEffect(() => {
+    if (
+      !containerRef.current ||
+      !tagsContainerRef.current ||
+      tags.length === 0
+    ) {
+      setVisibleTags(tags.length)
+      return
+    }
+
+    const containerWidth = containerRef.current.offsetWidth
+    const maxTagsWidth = containerWidth * 0.6
+    const tagElements = tagsContainerRef.current.children
+
+    let totalWidth = 0
+    let count = 0
+
+    for (let i = 0; i < tagElements.length; i++) {
+      const tagWidth = (tagElements[i] as HTMLElement).offsetWidth
+      if (totalWidth + tagWidth > maxTagsWidth) {
+        break
+      }
+      totalWidth += tagWidth
+      count++
+    }
+
+    setVisibleTags(Math.max(1, count)) // Always show at least 1 tag
+  }, [tags])
 
   const { refs, floatingStyles, context } = useFloating({
     open: isOpen,
@@ -71,18 +106,19 @@ export function TagSelectInput() {
           'border-[1] rounded-xl px-1 py-2 relative focus-within:border-white',
       })}
     >
-      <div className="h-full flex flex-row flex-12">
+      <div ref={containerRef} className="h-full flex flex-row flex-12">
         <span className="opacity-0 absolute whitespace-pre" ref={span}>
           {displayValue}
         </span>
         {!displayValue && tags.length === 0 && (
-          <span className="align-middle opacity-25 absolute top-6/12 -translate-y-6/12">
+          <span className="align-middle ms-2 opacity-25 absolute top-6/12 -translate-y-6/12">
             Select platforms...
           </span>
         )}
-        <div>
+        <div ref={tagsContainerRef}>
           <Tag
             tags={tags}
+            visibleTags={visibleTags}
             removeTag={(indexToRemove: number) =>
               setTags(tags.filter((_, index) => index !== indexToRemove))
             }
@@ -93,9 +129,10 @@ export function TagSelectInput() {
           type="text"
           value={displayValue}
           onChange={(e) => setDisplayValue(e.target.value)}
-          className="h-12/12 border-0 outline-0 w-full min-w-[4.1] "
+          className="h-12/12 ms-2 border-0 outline-0 w-full min-w-[4.1] "
         ></input>
       </div>
+      <ChevronDown className="absolute top-[50%] left-[95%] -translate-[50%]" />
       {isOpen && (
         <DropdownMenu
           options={[{ text: 'test1', value: 'test545' }]}
@@ -115,8 +152,13 @@ export function TagSelectInput() {
   )
 }
 
-function Tag(props: { tags: string[]; removeTag: (index: number) => void }) {
-  const { tags, removeTag } = props
+function Tag(props: {
+  tags: string[]
+  visibleTags: number
+  removeTag: (index: number) => void
+}) {
+  const { tags, visibleTags, removeTag } = props
+  const hiddenCount = tags.length - visibleTags
 
   const handleRemoveTag = (event: React.MouseEvent, i: number) => {
     event.preventDefault()
@@ -126,21 +168,27 @@ function Tag(props: { tags: string[]; removeTag: (index: number) => void }) {
 
   return (
     <>
-      {tags.map((tag, i) => (
+      {tags.slice(0, visibleTags).map((tag, i) => (
         <span
-          className={`bg-blue-500 rounded-xl px-1.5 py-1.5 ${
+          key={i}
+          className={`bg-blue-500 font-semibold rounded-xl px-1.5 py-1.5 ${
             i !== 0 && 'ms-1'
           }`}
         >
           {tag}
           <span
-            className="text-[12px] ps-1"
+            className="text-[12px] cursor-pointer font-semibold ps-1"
             onClick={(event) => handleRemoveTag(event, i)}
           >
             &#10005;
           </span>
         </span>
       ))}
+      {hiddenCount > 0 && (
+        <span className="bg-blue-500 font-semibold rounded-xl px-1.5 py-1.5 ms-1">
+          +{hiddenCount} more
+        </span>
+      )}
     </>
   )
 }
