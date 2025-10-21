@@ -135,12 +135,17 @@ export function TagSelectInput() {
       <ChevronDown className="absolute top-[50%] left-[95%] -translate-[50%]" />
       {isOpen && (
         <DropdownMenu
-          options={[{ text: 'test1', value: 'test545' }]}
-          onSelect={(opt) => {
-            setTags([...tags, opt as string])
+          options={[
+            { text: 'test1', value: 'test1' },
+            { text: 'test2', value: 'test2' },
+            { text: 'test3', value: 'test3' },
+          ]}
+          onSelect={(selectedValues) => {
+            setTags([...(selectedValues as string[])])
             setIsOpen(false)
             inputRef.current?.focus()
           }}
+          selectedValues={tags}
           onClose={() => setIsOpen(false)}
           refs={refs}
           floatingStyles={floatingStyles}

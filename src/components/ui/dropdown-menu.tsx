@@ -1,5 +1,6 @@
 'use client'
 import { ExtendedRefs, FloatingPortal } from '@floating-ui/react'
+import { Check } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 
 interface DropdownMenuProps {
@@ -10,7 +11,8 @@ interface DropdownMenuProps {
   ) => Record<string, unknown>
   isOpen: boolean
   options: { text: string; value?: string | number | object }[]
-  onSelect: (value: string | number | object) => void
+  selectedValues: (string | number | object)[]
+  onSelect: (values: (string | number | object)[]) => void
   onClose: () => void
 }
 
@@ -25,6 +27,7 @@ export function DropdownMenu(props: DropdownMenuProps) {
     getFloatingProps,
     isOpen,
     options,
+    selectedValues,
     onSelect,
     onClose,
   } = props
@@ -73,8 +76,7 @@ export function DropdownMenu(props: DropdownMenuProps) {
           break
         case 'Enter':
           e.preventDefault()
-          /* Set value at given index if present, otherwise set the text as value */
-          onSelect(options[cursor].value ?? options[cursor].text)
+          handleSelect(cursor)
           break
         case 'Escape':
           e.preventDefault()
@@ -89,6 +91,30 @@ export function DropdownMenu(props: DropdownMenuProps) {
       refEl.setAttribute('aria-expanded', 'false')
     }
   }, [isOpen, refs.domReference, cursor, max, onClose, onSelect, options])
+
+  const handleSelect = (index: number) => {
+    /* Check if element is already selected */
+    const value = options[index].value ?? options[index].text
+    const indexToRemove = selectedValues.findIndex((v) => v === value) //
+
+    let newSelected: (string | number | object)[]
+    /* Toggle: add if not selected, remove if already selected */
+    if (indexToRemove === -1) {
+      newSelected = [...selectedValues, value] // Use selectedValues
+    } else {
+      newSelected = selectedValues.filter((_, i) => i !== indexToRemove)
+    }
+
+    onSelect(newSelected)
+  }
+
+  const isSelected = (option: {
+    text: string
+    value?: string | number | object
+  }) => {
+    const value = option.value ?? option.text
+    return selectedValues.includes(String(value))
+  }
 
   return (
     <FloatingPortal>
@@ -115,18 +141,19 @@ export function DropdownMenu(props: DropdownMenuProps) {
                     setCursor(i)
                   })
                 }}
-                onClick={() =>
-                  onSelect(options[cursor].value ?? options[cursor].text)
-                }
+                onClick={() => handleSelect(i)}
                 key={i}
                 id={`option-${i}`}
                 role="option"
                 aria-selected={i === cursor}
-                className={`rounded-2xl px-4 cursor-pointer ${
-                  i === cursor ? 'bg-secondary' : ''
+                className={`rounded-2xl px-4 cursor-pointer flex justify-between ${
+                  i === cursor || isSelected(option) ? 'bg-secondary' : ''
                 }`}
               >
-                {option.text}
+                <span>{option.text}</span>
+                {isSelected(option) && (
+                  <Check className="text-blue-400 text-[12px]" />
+                )}
               </li>
             ))}
           </ul>
