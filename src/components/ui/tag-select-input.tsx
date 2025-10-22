@@ -63,9 +63,10 @@ export function TagSelectInput() {
     setVisibleTags(Math.max(1, count)) // Always show at least 1 tag
   }, [tags])
 
-  const { refs, floatingStyles, context } = useFloating({
+  const { refs, floatingStyles, context, isPositioned } = useFloating({
     open: isOpen,
     onOpenChange: setIsOpen,
+    strategy: 'fixed',
     middleware: [
       offset(4),
       flip(),
@@ -82,7 +83,7 @@ export function TagSelectInput() {
     whileElementsMounted: autoUpdate,
   })
 
-  const click = useClick(context, { keyboardHandlers: false })
+  const click = useClick(context, { keyboardHandlers: false, toggle: true })
   const dismiss = useDismiss(context, {
     outsidePress: true,
     escapeKey: true,
@@ -99,8 +100,11 @@ export function TagSelectInput() {
     <div
       ref={refs.setReference}
       {...getReferenceProps({
-        onClick: () => {
-          inputRef.current?.focus()
+        onMouseDown: (e) => {
+          e.preventDefault()
+          if (document.activeElement !== inputRef.current) {
+            inputRef.current?.focus()
+          }
         },
         className:
           'border-[1] rounded-xl px-1 py-2 relative focus-within:border-white',
