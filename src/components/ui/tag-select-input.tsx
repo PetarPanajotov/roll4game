@@ -168,7 +168,7 @@ export function TagSelectInput(props: TagSelectInputProps) {
     }
 
     setVisibleTags(tags.length > 0 ? Math.max(1, best) : 0)
-  }, [tags, getLabel]) // rerun when tags or their labels change
+  }, [tags, getLabel])
 
   /**
    * Keep visibleTags responsive to container size changes (e.g., window resize).
@@ -177,8 +177,7 @@ export function TagSelectInput(props: TagSelectInputProps) {
     const el = containerRef.current
     if (!el) return
     const ro = new ResizeObserver(() => {
-      // Trigger the measure effect by a benign state tick:
-      setVisibleTags((v) => v) // noop that still causes dependency re-eval of layout pass
+      setVisibleTags((v) => v)
     })
     ro.observe(el)
     return () => ro.disconnect()
@@ -272,7 +271,7 @@ export function TagSelectInput(props: TagSelectInputProps) {
           options={filteredOptions}
           onSelect={(selectedValues) => {
             updateTags(selectedValues)
-            setDisplayValue('') // clear query after a pick
+            setDisplayValue('')
             setIsOpen(false)
             inputRef.current?.focus()
           }}

@@ -46,15 +46,19 @@ export default function RandomPage() {
             </h1>
           </CardHeader>
           <CardBody>
-            <Label htmlFor="tag">Platform</Label>
-            <TagSelectInput
-              id="tag"
-              placeholder="Select platforms..."
-              options={[
-                { label: 'Modern', options: [...GAME_MODERN_PLATFORMS] },
-                { label: 'Legacy', options: [...GAME_LEGACY_PLATFORMS] },
-              ]}
-            />
+            <div className="grid grid-cols-12 gap-4">
+              <div className="col-span-6">
+                <Label htmlFor="tag">Platform</Label>
+                <TagSelectInput
+                  id="tag"
+                  placeholder="Select platforms..."
+                  options={[
+                    { label: 'Modern', options: [...GAME_MODERN_PLATFORMS] },
+                    { label: 'Legacy', options: [...GAME_LEGACY_PLATFORMS] },
+                  ]}
+                />
+              </div>
+            </div>
           </CardBody>
         </Card>
 
