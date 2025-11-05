@@ -11,6 +11,7 @@ import {
   GAME_LEGACY_PLATFORMS,
   GAME_MODERN_PLATFORMS,
 } from '@/lib/constants/game-platforms'
+import { GENRES } from '@/lib/constants/genres'
 
 export default function RandomPage() {
   const [game, setGame] = useState<Game | null>(null)
@@ -56,6 +57,14 @@ export default function RandomPage() {
                     { label: 'Modern', options: [...GAME_MODERN_PLATFORMS] },
                     { label: 'Legacy', options: [...GAME_LEGACY_PLATFORMS] },
                   ]}
+                />
+              </div>
+              <div className="col-span-6">
+                <Label htmlFor="tag">Genres</Label>
+                <TagSelectInput
+                  id="tag"
+                  placeholder="Select Genres..."
+                  options={[...GENRES]}
                 />
               </div>
             </div>
