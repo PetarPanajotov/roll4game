@@ -45,42 +45,51 @@ export function TagSelectInput(props: TagSelectInputProps) {
     disabled = false,
   } = props
 
-  // controlled vs uncontrolled
+  /** Build value → label map once per options change */
+  const normalizedOptions = useMemo(() => {
+    const entries: { label: string; value: Value }[] = []
+    if (isGrouped(options)) {
+      for (const g of options)
+        for (const o of g.options)
+          entries.push({ label: o.text, value: o.value })
+    } else {
+      for (const o of options) entries.push({ label: o.text, value: o.value })
+    }
+    return entries
+  }, [options])
+
+  const getLabelByValue = (valueForSearch: Value) => {
+    const foundOption = normalizedOptions.find(
+      (option) => option.value === valueForSearch
+    )
+    if (foundOption) {
+      return foundOption.label
+    } else {
+      return ''
+    }
+  }
+
   const isControlled = value !== undefined
-  const [internalTags, setInternalTags] = useState<Value[]>(defaultValue ?? [])
-  const tags = (isControlled ? value! : internalTags) as Value[]
+
+  const [tags, setTags] = useState<Value[]>(defaultValue ?? [])
+  const [displayTags, setDisplayTags] = useState<string[]>(
+    defaultValue ? defaultValue.map((el) => getLabelByValue(el)) : []
+  )
 
   const [displayValue, setDisplayValue] = useState('')
   const [isOpen, setIsOpen] = useState(false)
-  const [visibleTags, setVisibleTags] = useState<number>(tags.length)
 
   const inputRef = useRef<HTMLInputElement>(null)
   const span = useRef<HTMLSpanElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
   const tagsContainerRef = useRef<HTMLDivElement>(null)
 
-  const tagsSizerRef = useRef<HTMLDivElement>(null)
-  const moreSizerRef = useRef<HTMLSpanElement>(null)
-
-  /** Build value → label map once per options change */
-  const valueToLabel = useMemo(() => {
-    const entries: Array<[string, string]> = []
-    if (isGrouped(options)) {
-      for (const g of options)
-        for (const o of g.options) entries.push([normalize(o.value), o.text])
-    } else {
-      for (const o of options) entries.push([normalize(o.value), o.text])
-    }
-    return new Map<string, string>(entries)
-  }, [options])
-
-  const getLabel = (v: Value) => valueToLabel.get(normalize(v)) ?? normalize(v)
-
-  const updateTags = (next: Value[]) => {
-    if (isControlled) onChange?.(next)
+  const updateTags = (tagsValue: Value[]) => {
+    if (isControlled) onChange?.(tags)
     else {
-      setInternalTags(next)
-      onChange?.(next)
+      setTags(tagsValue)
+      setDisplayTags(tagsValue.map((el) => getLabelByValue(el)))
+      onChange?.(tagsValue)
     }
   }
 
@@ -110,82 +119,12 @@ export function TagSelectInput(props: TagSelectInputProps) {
     }
   }, [options, displayValue])
 
-  // Resize input to its ghost span
-  useEffect(() => {
-    if (span.current && inputRef.current) {
-      inputRef.current.style.width = `${span.current.offsetWidth}px`
-    }
-  }, [displayValue])
-
-  /**
-   * Recompute how many tags fit within ~60% of the input container.
-   * Uses hidden sizers to avoid measuring the already-truncated UI.
-   */
-  useEffect(() => {
-    const containerEl = containerRef.current
-    const sizerEl = tagsSizerRef.current
-    const moreEl = moreSizerRef.current
-
-    if (!containerEl || !sizerEl || tags.length === 0) {
-      setVisibleTags(tags.length)
-      return
-    }
-
-    const containerWidth = containerEl.offsetWidth
-    const maxTagsWidth = containerWidth * 0.6
-    const chipEls = Array.from(
-      sizerEl.querySelectorAll('[data-chip="1"]')
-    ) as HTMLElement[]
-    const chipWidths = chipEls.map((el) => el.offsetWidth)
-
-    if (chipWidths.length !== tags.length) {
-      setVisibleTags(Math.max(1, Math.min(tags.length, visibleTags)))
-      return
-    }
-
-    // Helper: width of the “+N more” chip
-    const moreWidthFor = (hiddenCount: number) => {
-      if (!moreEl || hiddenCount <= 0) return 0
-      moreEl.textContent = `+${hiddenCount} more`
-      return moreEl.offsetWidth
-    }
-
-    // Fit as many as possible; include “+N more” if not all fit.
-    let best = tags.length
-    let running = 0
-
-    for (let i = 0; i < tags.length; i++) {
-      running += chipWidths[i]
-      const hiddenCount = tags.length - (i + 1)
-      const totalNeeded =
-        hiddenCount > 0 ? running + moreWidthFor(hiddenCount) : running
-
-      if (totalNeeded <= maxTagsWidth) {
-        best = i + 1
-      } else {
-        break
-      }
-    }
-
-    setVisibleTags(tags.length > 0 ? Math.max(1, best) : 0)
-  }, [tags, getLabel])
-
-  /**
-   * Keep visibleTags responsive to container size changes (e.g., window resize).
-   */
-  useEffect(() => {
-    const el = containerRef.current
-    if (!el) return
-    const ro = new ResizeObserver(() => {
-      setVisibleTags((v) => v)
-    })
-    ro.observe(el)
-    return () => ro.disconnect()
-  }, [])
-
   const { refs, floatingStyles, context } = useFloating({
     open: isOpen,
-    onOpenChange: setIsOpen,
+    onOpenChange: (open) => {
+      setIsOpen(open)
+      if (!open) setDisplayValue('')
+    },
     strategy: 'fixed',
     middleware: [
       offset(4),
@@ -214,7 +153,29 @@ export function TagSelectInput(props: TagSelectInputProps) {
   // Open the menu as the user types
   useEffect(() => {
     if (displayValue && !isOpen) setIsOpen(true)
-  }, [displayValue, isOpen])
+  }, [displayValue])
+
+  useEffect(() => {
+    const handleWindowBlur = () => {
+      setIsOpen(false)
+      setDisplayValue('')
+    }
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'hidden') {
+        setIsOpen(false)
+        setDisplayValue('')
+      }
+    }
+
+    window.addEventListener('blur', handleWindowBlur)
+    document.addEventListener('visibilitychange', handleVisibilityChange)
+
+    return () => {
+      window.removeEventListener('blur', handleWindowBlur)
+      document.removeEventListener('visibilitychange', handleVisibilityChange)
+    }
+  }, [])
 
   return (
     <div
@@ -242,11 +203,9 @@ export function TagSelectInput(props: TagSelectInputProps) {
           </span>
         )}
 
-        <div ref={tagsContainerRef}>
+        <div className="flex" ref={tagsContainerRef}>
           <Tag
-            tags={tags}
-            visibleTags={visibleTags}
-            getLabel={getLabel}
+            tags={displayTags}
             removeTag={(indexToRemove: number) =>
               updateTags(tags.filter((_, index) => index !== indexToRemove))
             }
@@ -255,6 +214,7 @@ export function TagSelectInput(props: TagSelectInputProps) {
 
         <input
           ref={inputRef}
+          autoComplete="off"
           type="text"
           value={displayValue}
           onChange={(e) => setDisplayValue(e.target.value)}
@@ -283,30 +243,6 @@ export function TagSelectInput(props: TagSelectInputProps) {
           isOpen={isOpen}
         />
       )}
-
-      {/* ===== Hidden sizer: offscreen measurement (no feedback loop) ===== */}
-      <div
-        ref={tagsSizerRef}
-        aria-hidden
-        className="invisible absolute -z-50 pointer-events-none"
-        style={{ left: -9999, top: -9999 }}
-      >
-        {tags.map((t, i) => (
-          <span
-            key={`s-${i}`}
-            data-chip="1"
-            className="bg-blue-500 font-semibold rounded-xl px-1.5 py-1 inline-block mr-1"
-          >
-            {getLabel(t)}
-          </span>
-        ))}
-        <span
-          ref={moreSizerRef}
-          className="bg-blue-500 font-semibold rounded-xl px-1.5 py-1 inline-block"
-        >
-          +0 more
-        </span>
-      </div>
     </div>
   )
 }
@@ -315,14 +251,8 @@ function getFloatingStylesForMenu(styles: React.CSSProperties) {
   return styles
 }
 
-function Tag(props: {
-  tags: Value[]
-  visibleTags: number
-  getLabel: (v: Value) => string
-  removeTag: (index: number) => void
-}) {
-  const { tags, visibleTags, getLabel, removeTag } = props
-  const hiddenCount = tags.length - visibleTags
+function Tag(props: { tags: string[]; removeTag: (index: number) => void }) {
+  const { tags, removeTag } = props
 
   const handleRemoveTag = (event: React.MouseEvent, i: number) => {
     event.preventDefault()
@@ -330,18 +260,26 @@ function Tag(props: {
     removeTag(i)
   }
 
+  const transformLabel = (text: string) => {
+    if (text.length > 5) {
+      return normalize(text).substring(0, 5) + '...'
+    } else {
+      return normalize(text)
+    }
+  }
+
   return (
     <>
-      {tags.slice(0, visibleTags).map((tag, i) => (
+      {tags.slice(0, 2).map((tag, i) => (
         <span
           key={i}
-          className={`bg-blue-500 font-semibold rounded-xl px-1.5 py-1 ${
-            i !== 0 && 'ms-1'
+          className={`bg-blue-500 px-[3px] py-[2px] text-[0.85rem] rounded-sm ${
+            i !== 0 && 'ms-2'
           }`}
         >
-          {getLabel(tag)}
+          {transformLabel(tag as string)}
           <span
-            className="text-[12px] cursor-pointer font-semibold ps-1"
+            className="text-[0.65rem] cursor-pointer font-semibold ps-1"
             onClick={(event) => handleRemoveTag(event, i)}
             aria-label="Remove tag"
             role="button"
@@ -350,9 +288,11 @@ function Tag(props: {
           </span>
         </span>
       ))}
-      {hiddenCount > 0 && (
-        <span className="bg-blue-500 font-semibold rounded-xl px-1.5 py-1 ms-1">
-          +{hiddenCount} more
+      {tags.length > 2 && (
+        <span
+          className={`bg-blue-500 px-[3px] py-[2px] text-[0.85rem] rounded-sm ms-2`}
+        >
+          +{tags.length - 2}...
         </span>
       )}
     </>
