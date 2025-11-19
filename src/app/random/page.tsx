@@ -12,6 +12,7 @@ import {
   GAME_MODERN_PLATFORMS,
 } from '@/lib/constants/game-platforms'
 import { GENRES } from '@/lib/constants/genres'
+import RangeInput from '@/components/ui/range-input'
 
 export default function RandomPage() {
   const [game, setGame] = useState<Game | null>(null)
@@ -66,6 +67,10 @@ export default function RandomPage() {
                   placeholder="Select Genres..."
                   options={[...GENRES]}
                 />
+              </div>
+              <div className="col-span-6">
+                <Label>Rating</Label>
+                <RangeInput marks={{ 0: '0', 50: '50', 100: '100' }} />
               </div>
             </div>
           </CardBody>
