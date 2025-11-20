@@ -12,7 +12,7 @@ import {
   GAME_MODERN_PLATFORMS,
 } from '@/lib/constants/game-platforms'
 import { GENRES } from '@/lib/constants/genres'
-import RangeInput from '@/components/ui/range-input'
+import RangeInput from '@/components/ui/range-input/RangeInput'
 
 export default function RandomPage() {
   const [game, setGame] = useState<Game | null>(null)
