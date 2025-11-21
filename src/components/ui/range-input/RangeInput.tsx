@@ -6,32 +6,13 @@ import React, {
   useState,
 } from 'react'
 import styles from './RangeInput.module.scss'
-
-type RangeSliderProps = {
-  min?: number
-  max?: number
-  step?: number
-  value?: [number, number]
-  defaultValue?: [number, number]
-  marks?: Marks
-  onChange?: (value: [number, number]) => void
-}
-
-type MarkObject = {
-  style?: CSSProperties
-  label: ReactNode
-}
-
-type MarkValue = ReactNode | MarkObject
-
-type Marks = Record<number, MarkValue>
-
-export type NormalizedMark = {
-  value: number
-  left: number
-  label: ReactNode
-  style: CSSProperties
-}
+import {
+  MarkObject,
+  Marks,
+  MarkValue,
+  NormalizedMark,
+  RangeSliderProps,
+} from './RangeInput.types'
 
 export default function RangeInput({
   min = 0,
@@ -39,62 +20,81 @@ export default function RangeInput({
   step = 1,
   marks = {},
   defaultValue = [20, 80],
+  value,
   onChange,
 }: RangeSliderProps) {
-  const [range, setRange] = useState<[number, number]>(defaultValue)
+  const isControlled = value !== undefined
+
   const trackRef = useRef<HTMLDivElement | null>(null)
-  const dragging = useRef<'min' | 'max' | null>(null)
+  const draggingIndex = useRef<number | null>(null)
+
+  const [internalValues, setInternalValues] = useState<number[]>(defaultValue)
+
+  const values = isControlled ? (value as number[]) : internalValues
 
   const pct = (value: number) => ((value - min) / (max - min)) * 100
 
-  const leftValue = Math.min(range[0], range[1])
-  const rightValue = Math.max(range[0], range[1])
+  let leftPct = 0
+  let widthPct = 0
 
-  const leftPct = pct(leftValue)
-  const widthPct = pct(rightValue) - pct(leftValue)
+  if (values.length === 1) {
+    const v = values[0]
+    const start = pct(min)
+    const end = pct(v)
+
+    leftPct = Math.min(start, end)
+    widthPct = Math.abs(end - start)
+  } else if (values.length > 1) {
+    const minValue = Math.min(...values)
+    const maxValue = Math.max(...values)
+
+    leftPct = pct(minValue)
+    widthPct = pct(maxValue) - pct(minValue)
+  }
+
+  const setValues = (next: number[]) => {
+    if (!isControlled) {
+      setInternalValues(next)
+    }
+    onChange?.(next)
+  }
 
   const normalizedMarks = useMemo(
     () => normalizeMarks(marks, min, max),
     [marks, min, max]
   )
 
-  const updateValue = (clientX: number, forcedThumb?: 'min' | 'max') => {
+  const updateValue = (clientX: number, forcedIndex?: number) => {
     if (!trackRef.current) return
 
     const rect = trackRef.current.getBoundingClientRect()
     let ratio = (clientX - rect.left) / rect.width
     ratio = Math.min(1, Math.max(0, ratio))
 
-    // convert to stepped value
     const newValue = Math.round((min + ratio * (max - min)) / step) * step
 
-    let [valMin, valMax] = range
-    const thumb = forcedThumb ?? dragging.current
-    if (!thumb) return
+    const index = forcedIndex ?? draggingIndex.current
+    if (index == null) return
 
-    if (thumb === 'min') {
-      valMin = newValue
-    } else if (thumb === 'max') {
-      valMax = newValue
+    const next = [...values]
+    next[index] = newValue
+    setValues(next)
+  }
+
+  const startDrag =
+    (index: number) =>
+    (e: React.PointerEvent<HTMLDivElement>): void => {
+      draggingIndex.current = index
+      ;(e.target as HTMLElement).setPointerCapture(e.pointerId)
     }
 
-    const next: [number, number] = [valMin, valMax]
-    setRange(next)
-    onChange?.(next)
-  }
-
-  const startDrag = (thumb: 'min' | 'max') => (e: React.PointerEvent) => {
-    dragging.current = thumb
-    ;(e.target as HTMLElement).setPointerCapture(e.pointerId)
-  }
-
   const onMove = (e: React.PointerEvent) => {
-    if (!dragging.current) return
+    if (draggingIndex.current == null) return
     updateValue(e.clientX)
   }
 
   const stopDrag = (e: React.PointerEvent) => {
-    dragging.current = null
+    draggingIndex.current = null
     ;(e.target as HTMLElement).releasePointerCapture(e.pointerId)
   }
 
@@ -103,7 +103,6 @@ export default function RangeInput({
 
     const target = e.target as HTMLElement
 
-    // Ignore clicks on thumbs – let drag logic handle these
     if (target.classList.contains(styles.riThumb)) {
       return
     }
@@ -114,13 +113,17 @@ export default function RangeInput({
 
     const clickedValue = Math.round((min + ratio * (max - min)) / step) * step
 
-    const [valMin, valMax] = range
-    const distToMin = Math.abs(clickedValue - valMin)
-    const distToMax = Math.abs(clickedValue - valMax)
+    let closestIndex = 0
+    let smallestDist = Infinity
+    values.forEach((v, i) => {
+      const dist = Math.abs(clickedValue - v)
+      if (dist < smallestDist) {
+        smallestDist = dist
+        closestIndex = i
+      }
+    })
 
-    const closestThumb: 'min' | 'max' = distToMin <= distToMax ? 'min' : 'max'
-
-    updateValue(e.clientX, closestThumb)
+    updateValue(e.clientX, closestIndex)
   }
 
   return (
@@ -137,33 +140,22 @@ export default function RangeInput({
             width: `${widthPct}%`,
           }}
         />
-        <div
-          className={styles.riThumb}
-          style={{ left: `${pct(range[0])}%` }}
-          onPointerDown={startDrag('min')}
-          onPointerMove={onMove}
-          onPointerUp={stopDrag}
-          onPointerEnter={(e) =>
-            e.currentTarget.classList.add(styles.riThumbActive)
-          }
-          onPointerLeave={(e) =>
-            e.currentTarget.classList.remove(styles.riThumbActive)
-          }
-        />
-        <div
-          className={styles.riThumb}
-          style={{ left: `${pct(range[1])}%` }}
-          onPointerDown={startDrag('max')}
-          onPointerMove={onMove}
-          onPointerUp={stopDrag}
-          onPointerEnter={(e) =>
-            e.currentTarget.classList.add(styles.riThumbActive)
-          }
-          onPointerLeave={(e) =>
-            e.currentTarget.classList.remove(styles.riThumbActive)
-          }
-        />
-        {/* MARKS */}
+        {values.map((val, index) => (
+          <div
+            key={index}
+            className={styles.riThumb}
+            style={{ left: `${pct(val)}%` }}
+            onPointerDown={startDrag(index)}
+            onPointerMove={onMove}
+            onPointerUp={stopDrag}
+            onPointerEnter={(e) =>
+              e.currentTarget.classList.add(styles.riThumbActive)
+            }
+            onPointerLeave={(e) =>
+              e.currentTarget.classList.remove(styles.riThumbActive)
+            }
+          />
+        ))}
         {normalizedMarks.map((mark) => (
           <div
             key={mark.value}

@@ -70,7 +70,10 @@ export default function RandomPage() {
               </div>
               <div className="col-span-6">
                 <Label>Rating</Label>
-                <RangeInput marks={{ 0: '0', 50: '50', 100: '100' }} />
+                <RangeInput
+                  marks={{ 0: '0', 50: '50', 100: '100' }}
+                  defaultValue={[50, 100]}
+                />
               </div>
             </div>
           </CardBody>
