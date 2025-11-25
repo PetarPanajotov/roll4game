@@ -13,6 +13,7 @@ import {
   NormalizedMark,
   RangeSliderProps,
 } from './RangeInput.types'
+import Tooltip from '../tooltip/Tooltip'
 
 export default function RangeInput({
   min = 0,
@@ -156,6 +157,8 @@ export default function RangeInput({
             }
           />
         ))}
+        {/* {trackRef.current && <Tooltip triggerRef={trackRef}></Tooltip>} */}
+
         {normalizedMarks.map((mark) => (
           <div
             key={mark.value}
