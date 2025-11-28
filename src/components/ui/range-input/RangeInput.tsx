@@ -13,7 +13,7 @@ import {
   NormalizedMark,
   RangeSliderProps,
 } from './RangeInput.types'
-import Tooltip from '../tooltip/Tooltip'
+import { Tooltip, TooltipContent, TooltipTrigger } from '../tooltip/Tooltip'
 
 export default function RangeInput({
   min = 0,
@@ -142,22 +142,27 @@ export default function RangeInput({
           }}
         />
         {values.map((val, index) => (
-          <div
-            key={index}
-            className={styles.riThumb}
-            style={{ left: `${pct(val)}%` }}
-            onPointerDown={startDrag(index)}
-            onPointerMove={onMove}
-            onPointerUp={stopDrag}
-            onPointerEnter={(e) =>
-              e.currentTarget.classList.add(styles.riThumbActive)
-            }
-            onPointerLeave={(e) =>
-              e.currentTarget.classList.remove(styles.riThumbActive)
-            }
-          />
+          <Tooltip key={index}>
+            <TooltipTrigger>
+              <div
+                className={styles.riThumb}
+                style={{ left: `${pct(val)}%` }}
+                onPointerDown={startDrag(index)}
+                onPointerMove={onMove}
+                onPointerUp={stopDrag}
+                onPointerEnter={(e) =>
+                  e.currentTarget.classList.add(styles.riThumbActive)
+                }
+                onPointerLeave={(e) =>
+                  e.currentTarget.classList.remove(styles.riThumbActive)
+                }
+              />
+            </TooltipTrigger>
+            <TooltipContent>
+              <span>{val}</span>
+            </TooltipContent>
+          </Tooltip>
         ))}
-        {/* {trackRef.current && <Tooltip triggerRef={trackRef}></Tooltip>} */}
 
         {normalizedMarks.map((mark) => (
           <div
@@ -187,7 +192,6 @@ function normalizeMarks(
     const value = Number(key)
     if (Number.isNaN(value)) return acc
 
-    // ignore values outside [min, max]
     if (value < min || value > max) return acc
 
     const left = ((value - min) / (max - min)) * 100

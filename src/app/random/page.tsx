@@ -13,6 +13,11 @@ import {
 } from '@/lib/constants/game-platforms'
 import { GENRES } from '@/lib/constants/genres'
 import RangeInput from '@/components/ui/range-input/RangeInput'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '@/components/ui/tooltip/Tooltip'
 
 export default function RandomPage() {
   const [game, setGame] = useState<Game | null>(null)

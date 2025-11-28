@@ -5,18 +5,31 @@ import {
   FloatingPortal,
   offset,
   Placement,
-  shift,
   Strategy,
+  useClick,
   useFloating,
   UseFloatingReturn,
+  useHover,
+  useInteractions,
+  UseInteractionsReturn,
   useTransitionStyles,
 } from '@floating-ui/react'
-import { createContext, useContext, useEffect, useRef, useState } from 'react'
+import {
+  cloneElement,
+  createContext,
+  RefObject,
+  useContext,
+  useRef,
+  useState,
+} from 'react'
+import { twMerge } from 'tailwind-merge'
 
-type TooltipContextValue = UseFloatingReturn<HTMLElement> & {
-  animationDuration: number
-  arrowRef: React.RefObject<SVGSVGElement | null>
-}
+type TooltipContextValue = UseFloatingReturn<HTMLElement> &
+  UseInteractionsReturn & {
+    animationDuration: number
+    arrowRef: React.RefObject<SVGSVGElement | null>
+    withAnimation: boolean
+  }
 
 const TooltipContext = createContext<TooltipContextValue | null>(null)
 
@@ -28,83 +41,12 @@ export function useTooltipContext() {
   return ctx
 }
 
-export function TooltipTrigger({ children }: { children: React.ReactElement }) {
-  const { refs } = useTooltipContext()
-  const childRef = (children as any).ref
-
-  const setRef = (node: HTMLElement | null) => {
-    refs.setReference(node)
-    if (typeof childRef === 'function') childRef(node)
-    else if (childRef) (childRef as React.MutableRefObject<any>).current = node
-  }
-
-  return {}
-}
-
-export function TooltipContent({ children }: { children: React.ReactNode }) {
-  const [isVisible, setIsVisible] = useState(false)
-  const arrowRef = useRef(null)
-  const { refs, floatingStyles, context, animationDuration } =
-    useTooltipContext()
-
-  const { isMounted, styles: transitionStyles } = useTransitionStyles(context, {
-    duration: animationDuration,
-    initial: {
-      opacity: 0,
-    },
-    open: {
-      opacity: 1,
-    },
-    close: {
-      opacity: 0,
-    },
-    common: {
-      transitionProperty: 'opacity',
-    },
-  })
-
-  useEffect(() => {
-    const el = refs.domReference.current
-    if (!el) return
-
-    const onEnter = () => setIsVisible(true)
-    const onLeave = () => setIsVisible(false)
-
-    refs.setReference(el)
-    el.addEventListener('mouseenter', onEnter)
-    el.addEventListener('mouseleave', onLeave)
-    return () => {
-      el.removeEventListener('mouseenter', onEnter)
-      el.removeEventListener('mouseleave', onLeave)
-    }
-  }, [refs.domReference.current])
-
-  return (
-    <FloatingPortal>
-      {isMounted && (
-        <div
-          className="bg-red-500 py-1 px-2 rounded-[9px]"
-          ref={refs.setFloating}
-          style={{ ...floatingStyles, ...transitionStyles }}
-        >
-          <FloatingArrow
-            className="fill-red-500"
-            ref={arrowRef}
-            context={context}
-          />
-          Test
-        </div>
-      )}
-    </FloatingPortal>
-  )
-}
-
 type TooltipProps = React.PropsWithChildren<{
   initialOpen?: boolean
   placement?: Placement
   strategy?: Strategy
   offset?: number
-  animation?: boolean
+  withAnimation?: boolean
   animationDuration?: number
   openEvent?: 'click' | 'hover'
   onOpen?: () => void
@@ -117,33 +59,129 @@ export function Tooltip({
   placement = 'top',
   strategy = 'absolute',
   offset: offsetNumber = 10,
-  animation = true,
+  withAnimation = true,
   animationDuration = 150,
   openEvent = 'hover',
   onOpen,
   onClose,
 }: TooltipProps) {
-  const [isVisible, setIsVisible] = useState(false)
+  const [isVisible, setIsVisible] = useState(initialOpen)
   const arrowRef = useRef<SVGSVGElement | null>(null)
 
   const floating = useFloating({
     placement: placement,
     strategy: strategy,
-    whileElementsMounted: autoUpdate,
-    middleware: [arrow({ element: arrowRef }), offset(offsetNumber), shift()],
+    whileElementsMounted: (ref, float, update) =>
+      autoUpdate(ref, float, update, { animationFrame: true }),
+    middleware: [offset(offsetNumber), arrow({ element: arrowRef })],
     open: isVisible,
-    onOpenChange: setIsVisible,
+    onOpenChange: (open) => {
+      setIsVisible(open)
+      open ? onOpen?.() : onClose?.()
+    },
   })
+
+  const hover = useHover(floating.context, {
+    enabled: openEvent === 'hover',
+    move: false,
+  })
+  const click = useClick(floating.context, {
+    enabled: openEvent === 'click',
+  })
+
+  const interactions = useInteractions([hover, click])
 
   const contextValue = {
     ...floating,
+    ...interactions,
     animationDuration,
     arrowRef,
+    withAnimation,
   } as TooltipContextValue
 
   return (
     <TooltipContext.Provider value={contextValue}>
       {children}
     </TooltipContext.Provider>
+  )
+}
+
+export function TooltipTrigger({ children }: { children: React.ReactElement }) {
+  const { refs } = useTooltipContext()
+
+  const childRef = (children as any).ref
+
+  const setRef = (node: HTMLElement | null) => {
+    refs.setReference(node)
+
+    if (typeof childRef === 'function') {
+      childRef(node)
+    } else if (childRef && 'current' in childRef) {
+      ;(childRef as RefObject<HTMLElement | null>).current = node
+    }
+  }
+
+  return cloneElement(
+    children as React.ReactElement<any>,
+    {
+      ref: setRef,
+    } as any
+  )
+}
+
+export function TooltipContent({
+  children,
+  className,
+  arrowClassName,
+}: {
+  children: React.ReactNode
+  className?: string
+  arrowClassName?: string
+}) {
+  const {
+    refs,
+    floatingStyles,
+    context,
+    animationDuration,
+    getFloatingProps,
+    arrowRef,
+  } = useTooltipContext()
+
+  const { isMounted, styles: transitionStyles } = useTransitionStyles(context, {
+    duration: animationDuration,
+    initial: { opacity: 0 },
+    open: { opacity: 1 },
+    close: { opacity: 0 },
+    common: { transitionProperty: 'opacity' },
+  })
+
+  return (
+    <FloatingPortal>
+      {isMounted && (
+        <div
+          {...getFloatingProps({
+            ref: refs.setFloating,
+            style: { ...floatingStyles, ...transitionStyles },
+            className: twMerge(
+              'bg-[rgba(42,10,61,0.85)] px-2 py-1 rounded-[9px] border border-purple-500/20',
+              className
+            ),
+          })}
+        >
+          <FloatingArrow
+            width={8}
+            height={5}
+            className={twMerge(
+              'fill-[rgba(42,10,61,0.85)] stroke-purple-500/20',
+              arrowClassName
+            )}
+            strokeWidth={1}
+            ref={arrowRef}
+            context={context}
+          />
+          {children}
+        </div>
+      )}
+    </FloatingPortal>
   )
 }
