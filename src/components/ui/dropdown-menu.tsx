@@ -40,7 +40,7 @@ type FlatItem = FlatLabel | FlatOption
 const isGroupedOptions = (
   opts: OptionsConfig
 ): opts is ReadonlyArray<OptionGroup> =>
-  Array.isArray(opts) && opts.length > 0 && 'label' in (opts as any)[0]
+  Array.isArray(opts) && opts.length > 0 && 'label' in opts[0]
 
 const normalize = (v: string | number | object) => String(v)
 

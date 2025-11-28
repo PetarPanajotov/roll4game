@@ -17,6 +17,8 @@ import {
 import {
   cloneElement,
   createContext,
+  ReactElement,
+  Ref,
   RefObject,
   useContext,
   useRef,
@@ -106,27 +108,33 @@ export function Tooltip({
   )
 }
 
-export function TooltipTrigger({ children }: { children: React.ReactElement }) {
+type TooltipTriggerProps<T extends HTMLElement = HTMLElement> = {
+  children: ReactElement<{ ref?: Ref<T> }>
+}
+
+export function TooltipTrigger<T extends HTMLElement = HTMLElement>({
+  children,
+}: TooltipTriggerProps<T>) {
   const { refs } = useTooltipContext()
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const childRef = (children as any).ref
 
-  const setRef = (node: HTMLElement | null) => {
-    refs.setReference(node)
+  const setRef = (node: T | null) => {
+    // give Floating UI the reference
+    refs.setReference(node as unknown as HTMLElement | null)
 
+    // preserve the original child's ref (if any)
     if (typeof childRef === 'function') {
       childRef(node)
     } else if (childRef && 'current' in childRef) {
-      ;(childRef as RefObject<HTMLElement | null>).current = node
+      ;(childRef as RefObject<T | null>).current = node
     }
   }
 
-  return cloneElement(
-    children as React.ReactElement<any>,
-    {
-      ref: setRef,
-    } as any
-  )
+  return cloneElement(children, {
+    ref: setRef,
+  })
 }
 
 export function TooltipContent({

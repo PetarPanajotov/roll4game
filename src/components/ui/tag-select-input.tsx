@@ -31,7 +31,7 @@ interface TagSelectInputProps {
 
 const normalize = (v: Value) => String(v)
 const isGrouped = (opts: OptionsConfig): opts is ReadonlyArray<OptionGroup> =>
-  Array.isArray(opts) && opts.length > 0 && 'label' in (opts as any)[0]
+  Array.isArray(opts) && opts.length > 0 && 'label' in opts[0]
 
 export function TagSelectInput(props: TagSelectInputProps) {
   const {
