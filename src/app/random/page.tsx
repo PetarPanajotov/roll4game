@@ -12,9 +12,11 @@ import { Game } from '@/types/game.types'
 import Image from 'next/image'
 import React, { useEffect, useState } from 'react'
 import Loading from './loading'
+import { IgdbGame } from '@/lib/igdb/igdb.types'
+import { normalizeUrl } from '@/lib/normalizeUrl'
 
 export default function RandomPage() {
-  const [game, setGame] = useState<Game | null>(null)
+  const [game, setGame] = useState<IgdbGame | null>(null)
   const [isLoading, setLoading] = useState<boolean>(false)
 
   const fetchgame = async () => {
@@ -26,7 +28,7 @@ export default function RandomPage() {
       },
     })
       .then((res) => res.json())
-      .then((data: Game) => {
+      .then((data: IgdbGame) => {
         setGame(data)
         setLoading(false)
       })
@@ -37,7 +39,7 @@ export default function RandomPage() {
   }, [])
 
   return (
-    <React.Fragment>
+    <>
       {isLoading && <Loading />}
       <div className="bg-[url('/mountain-bg.png')] w-[100%] object-cover bg-center h-120 bg-no-repeat bg-cover">
         <div className="flex justify-center align items-center h-[100%] w-[100%]">
@@ -100,7 +102,7 @@ export default function RandomPage() {
             <header className="flex gap-4 items-start">
               {game.cover && (
                 <Image
-                  src={game?.cover.url}
+                  src={normalizeUrl(game.cover.url)}
                   alt={`${game.name} cover`}
                   width={200}
                   height={150}
@@ -133,6 +135,6 @@ export default function RandomPage() {
           Pick another
         </button>
       </main>
-    </React.Fragment>
+    </>
   )
 }

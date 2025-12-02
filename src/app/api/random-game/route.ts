@@ -1,16 +1,23 @@
 import { fetchGameCoverById, getRandomGame } from '@/lib/igdb'
+import { IgdbGame } from '@/lib/igdb/igdb.types'
+import { IgdbClient } from '@/lib/igdb/igdbClient'
 import { normalizeUrl } from '@/lib/normalizeUrl'
-import { NextRequest } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 
 // Proxy the request from IGDB. Transform the cover to  valid url path.
 export async function GET(request: NextRequest) {
-  const game = await getRandomGame()
-  const cover = game?.cover ? await fetchGameCoverById(game.cover) : null
+  try {
+    const igdb = new IgdbClient()
+    const game = await igdb.getRandomGame()
 
-  if (cover) {
-    cover.url = normalizeUrl(cover.url)
+    // Return typed response
+    return NextResponse.json<IgdbGame>(game[0], {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+  } catch (error) {
+    return NextResponse.json({ error: 'Failed to fetch game' }, { status: 500 })
   }
-
-  const transformed = { ...game, cover: { ...cover } }
-  return new Response(JSON.stringify(transformed))
 }
