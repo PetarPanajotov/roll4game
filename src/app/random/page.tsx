@@ -14,6 +14,7 @@ import React, { useEffect, useState } from 'react'
 import Loading from './loading'
 import { IgdbGame } from '@/lib/igdb/igdb.types'
 import { normalizeUrl } from '@/lib/normalizeUrl'
+import { GameCover } from '@/components/ui/game-cover/GameCover'
 
 export default function RandomPage() {
   const [game, setGame] = useState<IgdbGame | null>(null)
@@ -94,25 +95,35 @@ export default function RandomPage() {
           </Card>
         </div>
       </div>
-      <main className="max-w-2xl mx-auto p-6">
-        {game && (
-          <div
-            className={`bg-card rounded-2xl border p-4 shadow-sm bg-cover bg-center bg-no-repeat`}
-          >
-            <header className="flex gap-4 items-start">
-              {game.cover && (
-                <Image
-                  src={normalizeUrl(game.cover.url)}
-                  alt={`${game.name} cover`}
-                  width={200}
-                  height={150}
-                />
-              )}
+      <div className="w-full h-2 bg-purple-600"></div>
+      {game && (
+        <main
+          className="px-15 h-auto py-10 w-[100%] object-cover bg-center relative bg-no-repeat bg-cover before:absolute
+    before:inset-0            
+    before:bg-black/70          
+    before:z-0                
+    before:content-['']"
+          style={{ backgroundImage: `url(${game.screenshots?.[0]?.url})` }}
+        >
+          <div className="flex justify-center relative z-10">
+            {
+              <GameCover
+                src={game.cover?.url ?? ''}
+                width={game.cover?.width}
+                height={game.cover?.height}
+                alt={`${game.name} cover`}
+              />
+            }
+            <div className="ps-8 flex flex-col w-[50%]">
               <div>
-                <h2 className="text-xl font-bold">{game.name}</h2>
+                <h2 className="text-3xl font-bold">{game.name}</h2>
                 {game.first_release_date && (
-                  <p className="text-sm opacity-70">
-                    {new Date(game.first_release_date * 1000).getFullYear()}
+                  <p className="text-lg opacity-70">
+                    {new Intl.DateTimeFormat('en-BG', {
+                      day: 'numeric',
+                      month: 'long',
+                      year: 'numeric',
+                    }).format(new Date(game.first_release_date * 1000))}
                   </p>
                 )}
                 {game.url && (
@@ -126,15 +137,16 @@ export default function RandomPage() {
                   </a>
                 )}
               </div>
-            </header>
-
-            {game.summary && <p className="mt-4">{game.summary}</p>}
+              {game.summary && (
+                <p className="mt-4">{game.summary ?? 'No summary'}</p>
+              )}
+            </div>
           </div>
-        )}
-        <button onClick={fetchgame} className="mt-6 px-4 py-2 rounded border">
-          Pick another
-        </button>
-      </main>
+        </main>
+      )}
+      <button onClick={fetchgame} className="mt-6 px-4 py-2 rounded border">
+        Pick another
+      </button>
     </>
   )
 }
