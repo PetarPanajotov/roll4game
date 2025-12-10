@@ -16,6 +16,8 @@ import { IgdbGame } from '@/lib/igdb/igdb.types'
 import { normalizeUrl } from '@/lib/normalizeUrl'
 import { GameCover } from '@/components/ui/game-cover/GameCover'
 import { ScreenshotCarousel } from '@/components/ui/screenshot-carousel/ScreenshotCarousel'
+import { CircleStarIcon, Star, StarIcon } from 'lucide-react'
+import { size } from '@floating-ui/react'
 
 export default function RandomPage() {
   const [game, setGame] = useState<IgdbGame | null>(null)
@@ -114,7 +116,7 @@ export default function RandomPage() {
     before:content-['']"
           style={{ backgroundImage: `url(${game.screenshots?.[0]?.url})` }}
         >
-          <div className="flex justify-center relative z-10">
+          <div className="flex justify-center relative z-10 gap-4">
             {
               <GameCover
                 src={game.cover?.url ?? ''}
@@ -146,9 +148,72 @@ export default function RandomPage() {
                   </a>
                 )}
               </div>
+              <svg
+                className="separator"
+                width="100%"
+                height="60"
+                viewBox="0 0 600 80"
+                preserveAspectRatio="none"
+              >
+                <defs>
+                  <linearGradient
+                    id="arcGradient"
+                    x1="0%"
+                    y1="0%"
+                    x2="100%"
+                    y2="0%"
+                  >
+                    <stop offset="0%" stopColor="#667eea" stopOpacity="1" />
+                    <stop offset="50%" stopColor="#764ba2" stopOpacity="1" />
+                    <stop offset="100%" stopColor="#f093fb" stopOpacity="1" />
+                  </linearGradient>
+                </defs>
+                <path
+                  d="M 0 60 Q 300 10, 600 60"
+                  stroke="url(#arcGradient)"
+                  stroke-width="3"
+                  fill="none"
+                />
+              </svg>
+              {game.genres && (
+                <p className="font-bold">
+                  Genre:{' '}
+                  <span className="font-normal">
+                    {game.genres.map((genre) => genre.name).join(', ')}
+                  </span>
+                </p>
+              )}
+              {game.platforms && (
+                <p className="font-bold">
+                  Pltaforms:{' '}
+                  <span className="font-normal">
+                    {game.platforms.map((platform) => platform.name).join(', ')}
+                  </span>
+                </p>
+              )}
               {game.summary && (
                 <p className="mt-4">{game.summary ?? 'No summary'}</p>
               )}
+            </div>
+            <div className="self-center">
+              <div className="flex flex-col gap-1 items-center">
+                <h4 className="text-xl text-center font-bold">Players score</h4>
+                <div className="flex gap-3 items-center">
+                  <Star size={48} />
+                  <span className="text-4xl leading-none">{86 / 10}</span>
+                </div>
+
+                <p className="text-sm">Based on 537 player reviews</p>
+              </div>
+              <div className="flex flex-col gap-1 items-center pt-12">
+                <h4 className="text-xl text-center font-bold">Critics score</h4>
+                <div className="flex gap-3 items-center">
+                  <Star size={48} />
+                  <span className="text-4xl leading-none">{86 / 10}</span>
+                </div>
+
+                <p className="text-sm">Based on 537 critic reviews</p>
+              </div>
             </div>
           </div>
         </main>
