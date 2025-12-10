@@ -15,9 +15,11 @@ import Loading from './loading'
 import { IgdbGame } from '@/lib/igdb/igdb.types'
 import { normalizeUrl } from '@/lib/normalizeUrl'
 import { GameCover } from '@/components/ui/game-cover/GameCover'
+import { ScreenshotCarousel } from '@/components/ui/screenshot-carousel/ScreenshotCarousel'
 
 export default function RandomPage() {
   const [game, setGame] = useState<IgdbGame | null>(null)
+  const [screenshotUrls, setScreenshotUrls] = useState<string[]>([])
   const [isLoading, setLoading] = useState<boolean>(false)
 
   const fetchgame = async () => {
@@ -38,6 +40,13 @@ export default function RandomPage() {
   useEffect(() => {
     fetchgame()
   }, [])
+
+  useEffect(() => {
+    if (game && game.screenshots && game.screenshots.length > 0) {
+      const screenshots = game.screenshots.map((screenshot) => screenshot.url)
+      setScreenshotUrls([...screenshots])
+    }
+  }, [game])
 
   return (
     <>
@@ -144,6 +153,7 @@ export default function RandomPage() {
           </div>
         </main>
       )}
+      <ScreenshotCarousel images={screenshotUrls} />
       <button onClick={fetchgame} className="mt-6 px-4 py-2 rounded border">
         Pick another
       </button>
