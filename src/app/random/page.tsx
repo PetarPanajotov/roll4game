@@ -109,7 +109,7 @@ export default function RandomPage() {
       <div className="w-full h-2 bg-purple-600"></div>
       {game && (
         <main
-          className="px-15 h-auto py-10 w-[100%] object-cover bg-center relative bg-no-repeat bg-cover before:absolute
+          className="px-15 h-auto py-10 w-[100%] object-cover bg-top relative bg-no-repeat bg-cover before:absolute
     before:inset-0            
     before:bg-black/70          
     before:z-0                
@@ -199,7 +199,7 @@ export default function RandomPage() {
               <div className="flex flex-col gap-1 items-center">
                 <h4 className="text-xl text-center font-bold">Players score</h4>
                 <div className="flex gap-3 items-center">
-                  <Star size={48} />
+                  <Star fill="green" className="text-green-700" size={48} />
                   <span className="text-4xl leading-none">{86 / 10}</span>
                 </div>
 
@@ -208,7 +208,7 @@ export default function RandomPage() {
               <div className="flex flex-col gap-1 items-center pt-12">
                 <h4 className="text-xl text-center font-bold">Critics score</h4>
                 <div className="flex gap-3 items-center">
-                  <Star size={48} />
+                  <Star fill="gold" className="text-orange-200" size={48} />
                   <span className="text-4xl leading-none">{86 / 10}</span>
                 </div>
 
