@@ -24,6 +24,17 @@ export default function RangeInput({
   value,
   onChange,
 }: RangeSliderProps) {
+  const stepDecimals = (s: number) => {
+    const str = s.toString()
+    if (str.includes('e-')) return parseInt(str.split('e-')[1], 10)
+    const dot = str.indexOf('.')
+    return dot === -1 ? 0 : str.length - dot - 1
+  }
+
+  const roundTo = (n: number, decimals: number) => {
+    const p = 10 ** decimals
+    return Math.round((n + Number.EPSILON) * p) / p
+  }
   const isControlled = value !== undefined
 
   const trackRef = useRef<HTMLDivElement | null>(null)
@@ -72,7 +83,10 @@ export default function RangeInput({
     let ratio = (clientX - rect.left) / rect.width
     ratio = Math.min(1, Math.max(0, ratio))
 
-    const newValue = Math.round((min + ratio * (max - min)) / step) * step
+    const decimals = stepDecimals(step)
+
+    let newValue = Math.round((min + ratio * (max - min)) / step) * step
+    newValue = roundTo(newValue, decimals)
 
     const index = forcedIndex ?? draggingIndex.current
     if (index == null) return

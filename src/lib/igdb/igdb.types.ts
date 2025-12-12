@@ -1,5 +1,7 @@
 export interface IgdbGame {
   id: number
+  aggregated_rating?: number
+  aggregated_rating_count?: number
   name: string
   first_release_date?: number
   summary?: string
@@ -8,6 +10,8 @@ export interface IgdbGame {
   platforms?: IgdbPlatform[]
   screenshots?: IgdbScreenshot[]
   videos?: IgdbVideo[]
+  rating?: number
+  rating_count?: number
   url: string
 }
 

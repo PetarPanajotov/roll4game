@@ -171,7 +171,7 @@ export function TooltipContent({
             ref: refs.setFloating,
             style: { ...floatingStyles, ...transitionStyles },
             className: twMerge(
-              'bg-[rgba(42,10,61,0.85)] px-2 py-1 rounded-[9px] border border-purple-500/20',
+              'bg-[rgba(42,10,61,0.85)] px-2 py-1 rounded-[9px] border border-purple-500/20 z-9999',
               className
             ),
           })}

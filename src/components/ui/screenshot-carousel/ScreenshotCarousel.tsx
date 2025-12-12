@@ -108,6 +108,7 @@ export function ScreenshotCarousel({ images }: ScreenshotCarouselProps) {
               className="px-2"
               style={{ flex: `0 0 ${100 / visibleCount}%` }}
             >
+              {/* TODO: Change to <Image /> component */}
               <img
                 src={src}
                 className="w-full h-auto rounded-lg object-cover pointer-events-none"

@@ -1,10 +1,10 @@
 'use client'
-import { Card, CardBody, CardHeader } from '@/components/ui/card'
+import { Card, CardBody, CardHeader } from '@/components/ui/card/Card'
 import { GameCover } from '@/components/ui/game-cover/GameCover'
-import { Label } from '@/components/ui/label'
+import { Label } from '@/components/ui/label/Label'
 import RangeInput from '@/components/ui/range-input/RangeInput'
 import { ScreenshotCarousel } from '@/components/ui/screenshot-carousel/ScreenshotCarousel'
-import { TagSelectInput } from '@/components/ui/tag-select-input'
+import { TagSelectInput } from '@/components/ui/tag-select-input/TagSelectInput'
 import {
   GAME_LEGACY_PLATFORMS,
   GAME_MODERN_PLATFORMS,
@@ -17,6 +17,7 @@ import Loading from './loading'
 import { useFormState } from '@/hooks/useFormState'
 
 export default function RandomPage() {
+  /*TODO: Refactor this component. It can be split into smaller ones. */
   const [game, setGame] = useState<IgdbGame | null>(null)
   const [screenshotUrls, setScreenshotUrls] = useState<string[]>([])
   const [isLoading, setLoading] = useState<boolean>(false)
@@ -44,13 +45,11 @@ export default function RandomPage() {
   }
 
   useEffect(() => {
-    fetchgame()
-  }, [])
-
-  useEffect(() => {
     if (game && game.screenshots && game.screenshots.length > 0) {
       const screenshots = game.screenshots.map((screenshot) => screenshot.url)
       setScreenshotUrls([...screenshots])
+    } else {
+      setScreenshotUrls([])
     }
   }, [game])
 
@@ -110,13 +109,14 @@ export default function RandomPage() {
                   <RangeInput
                     marks={{ 0: '0', 5: '5', 10: '10' }}
                     value={form.criticScore}
+                    step={0.1}
                     onChange={(v) => setField('criticScore', v)}
                   />
                 </div>
                 <div className="col-span-12 flex align-middle justify-center pt-6">
                   <button
                     onClick={fetchgame}
-                    className="rounded-2xl font-bold bg-gray-800 px-12 py-1"
+                    className="rounded-2xl font-bold bg-gray-800 px-12 py-1 cursor-pointer"
                   >
                     Roll for game
                   </button>
@@ -290,7 +290,7 @@ export default function RandomPage() {
               )}
             </div>
 
-            {/* Ratings Section */}
+            {/* TODO: Hardcoded Ratings Section */}
             <div className="w-full md:w-auto md:self-center">
               <div className="flex flex-row md:flex-col gap-6 md:gap-0 justify-around md:justify-start">
                 <div className="flex flex-col gap-1 items-center">
@@ -304,11 +304,15 @@ export default function RandomPage() {
                       size={36}
                     />
                     <span className="text-3xl md:text-4xl leading-none">
-                      {86 / 10}
+                      {game.rating ? (game.rating / 10).toFixed(1) : 'NaN'}
                     </span>
                   </div>
                   <p className="text-xs md:text-sm text-center">
-                    Based on 537 player reviews
+                    Based on{' '}
+                    <span className="font-bold underline">
+                      {game.rating_count ?? 0}
+                    </span>{' '}
+                    player reviews
                   </p>
                 </div>
                 <div className="flex flex-col gap-1 items-center md:pt-12">
@@ -322,11 +326,17 @@ export default function RandomPage() {
                       size={36}
                     />
                     <span className="text-3xl md:text-4xl leading-none">
-                      {86 / 10}
+                      {game.aggregated_rating
+                        ? (game.aggregated_rating / 10).toFixed(1)
+                        : 'NaN'}
                     </span>
                   </div>
                   <p className="text-xs md:text-sm text-center">
-                    Based on 537 critic reviews
+                    Based on{' '}
+                    <span className="font-bold underline">
+                      {game.aggregated_rating_count ?? 0}
+                    </span>{' '}
+                    critic reviews
                   </p>
                 </div>
               </div>
@@ -335,7 +345,9 @@ export default function RandomPage() {
         </main>
       )}
       <div className="w-full h-1 bg-purple-600"></div>
-      <ScreenshotCarousel images={screenshotUrls} />
+      {screenshotUrls.length > 0 && (
+        <ScreenshotCarousel images={screenshotUrls} />
+      )}
     </>
   )
 }

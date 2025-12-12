@@ -13,7 +13,11 @@ import {
   useRole,
 } from '@floating-ui/react'
 import React, { useEffect, useMemo, useRef, useState } from 'react'
-import { DropdownMenu, OptionGroup, OptionsConfig } from './dropdown-menu'
+import {
+  DropdownMenu,
+  OptionGroup,
+  OptionsConfig,
+} from '../dropdown-menu/DropdownMenu'
 import { ChevronDown } from 'lucide-react'
 
 type Value = string | number | object
