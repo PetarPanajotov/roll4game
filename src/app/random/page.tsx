@@ -57,17 +57,23 @@ export default function RandomPage() {
   return (
     <>
       {isLoading && <Loading />}
-      <div className="bg-[url('/mountain-bg.png')] w-[100%] object-cover bg-center h-120 bg-no-repeat bg-cover">
-        <div className="flex justify-center align items-center h-[100%] w-[100%]">
-          <Card className="max-w-2xl w-[100%] p-6">
+      <div
+        className="relative bg-[url('/mushrooms.png')] w-[100%] object-cover bg-center h-120 bg-no-repeat bg-cover before:absolute
+    before:inset-0            
+    before:bg-black/40          
+    before:z-0                
+    before:content-['']"
+      >
+        <div className="relative z-2 flex justify-center align items-center h-[100%] w-[100%]">
+          <Card className="max-w-2xl w-[100%] p-6 bg-black/92">
             <CardHeader>
               <h1 className="text-2xl font-semibold text-center mb-4">
                 Random Game Picker
               </h1>
             </CardHeader>
-            <CardBody>
+            <CardBody className="p-0">
               <div className="grid grid-cols-12 gap-4">
-                <div className="col-span-6">
+                <div className="col-span-12 md:col-span-6">
                   <Label htmlFor="tag">Platform</Label>
                   <TagSelectInput
                     id="tag"
@@ -80,7 +86,7 @@ export default function RandomPage() {
                     onChange={(v) => setField('platforms', v)}
                   />
                 </div>
-                <div className="col-span-6">
+                <div className="col-span-12 md:col-span-6">
                   <Label htmlFor="tag">Genres</Label>
                   <TagSelectInput
                     id="tag"
@@ -90,7 +96,7 @@ export default function RandomPage() {
                     onChange={(v) => setField('genres', v)}
                   />
                 </div>
-                <div className="col-span-6">
+                <div className="col-span-12 md:col-span-6">
                   <Label>User Score</Label>
                   <RangeInput
                     marks={{ 0: '0', 5: '5', 10: '10' }}
@@ -99,7 +105,7 @@ export default function RandomPage() {
                     onChange={(v) => setField('userScore', v)}
                   />
                 </div>
-                <div className="col-span-6">
+                <div className="col-span-12 md:col-span-6">
                   <Label>Critics Score</Label>
                   <RangeInput
                     marks={{ 0: '0', 5: '5', 10: '10' }}
@@ -120,7 +126,7 @@ export default function RandomPage() {
           </Card>
         </div>
       </div>
-      <div className="w-full h-2 bg-purple-600"></div>
+      <div className="w-full h-1 bg-purple-600"></div>
       {game && (
         <main
           className="px-15 h-auto py-10 w-[100%] object-cover bg-top relative bg-no-repeat bg-cover before:absolute
@@ -130,16 +136,42 @@ export default function RandomPage() {
     before:content-['']"
           style={{ backgroundImage: `url(${game.screenshots?.[0]?.url})` }}
         >
-          <div className="flex justify-center relative z-10 gap-4">
-            {
+          <div className="flex flex-col md:flex-row justify-center items-start md:items-center relative z-10 gap-4 p-4">
+            {/* Game Cover and Title Section */}
+            <div className="flex gap-4 w-full md:w-auto">
               <GameCover
                 src={game.cover?.url ?? ''}
                 width={game.cover?.width}
                 height={game.cover?.height}
                 alt={`${game.name} cover`}
+                className="w-24 h-auto md:w-auto"
               />
-            }
-            <div className="ps-8 flex flex-col w-[50%]">
+              <div className="flex flex-col justify-start md:hidden flex-1">
+                <h2 className="text-xl font-bold leading-tight">{game.name}</h2>
+                {game.first_release_date && (
+                  <p className="text-sm opacity-70 mt-1">
+                    {new Intl.DateTimeFormat('en-BG', {
+                      day: 'numeric',
+                      month: 'long',
+                      year: 'numeric',
+                    }).format(new Date(game.first_release_date * 1000))}
+                  </p>
+                )}
+                {game.url && (
+                  <a
+                    href={game.url}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-xs underline mt-1"
+                  >
+                    View on IGDB
+                  </a>
+                )}
+              </div>
+            </div>
+
+            {/* Desktop Title Section */}
+            <div className="hidden md:flex md:ps-8 flex-col md:w-[50%]">
               <div>
                 <h2 className="text-3xl font-bold">{game.name}</h2>
                 {game.first_release_date && (
@@ -199,7 +231,7 @@ export default function RandomPage() {
               )}
               {game.platforms && (
                 <p className="font-bold">
-                  Pltaforms:{' '}
+                  Platforms:{' '}
                   <span className="font-normal">
                     {game.platforms.map((platform) => platform.name).join(', ')}
                   </span>
@@ -209,41 +241,101 @@ export default function RandomPage() {
                 <p className="mt-4">{game.summary ?? 'No summary'}</p>
               )}
             </div>
-            <div className="self-center">
-              <div className="flex flex-col gap-1 items-center">
-                <h4 className="text-xl text-center font-bold">Players score</h4>
-                <div className="flex gap-3 items-center">
-                  <Star
-                    className="fill-green-700 text-green-600"
-                    strokeWidth={1}
-                    size={48}
-                  />
-                  <span className="text-4xl leading-none">{86 / 10}</span>
-                </div>
 
-                <p className="text-sm">Based on 537 player reviews</p>
-              </div>
-              <div className="flex flex-col gap-1 items-center pt-12">
-                <h4 className="text-xl text-center font-bold">Critics score</h4>
-                <div className="flex gap-3 items-center">
-                  <Star
-                    className="fill-orange-200 text-orange-100"
-                    strokeWidth={1}
-                    size={48}
-                  />
-                  <span className="text-4xl leading-none">{86 / 10}</span>
+            {/* Mobile Summary Section */}
+            <div className="w-full md:hidden space-y-3">
+              <svg
+                className="separator"
+                width="100%"
+                height="40"
+                viewBox="0 0 600 80"
+                preserveAspectRatio="none"
+              >
+                <defs>
+                  <linearGradient
+                    id="arcGradientMobile"
+                    x1="0%"
+                    y1="0%"
+                    x2="100%"
+                    y2="0%"
+                  >
+                    <stop offset="0%" stopColor="#667eea" stopOpacity="1" />
+                    <stop offset="50%" stopColor="#764ba2" stopOpacity="1" />
+                    <stop offset="100%" stopColor="#f093fb" stopOpacity="1" />
+                  </linearGradient>
+                </defs>
+                <path
+                  d="M 0 60 Q 300 10, 600 60"
+                  stroke="url(#arcGradientMobile)"
+                  strokeWidth="3"
+                  fill="none"
+                />
+              </svg>
+              {game.genres && (
+                <p className="text-sm">
+                  <span className="font-bold">Genre: </span>
+                  {game.genres.map((genre) => genre.name).join(', ')}
+                </p>
+              )}
+              {game.platforms && (
+                <p className="text-sm">
+                  <span className="font-bold">Platforms: </span>
+                  {game.platforms.map((platform) => platform.name).join(', ')}
+                </p>
+              )}
+              {game.summary && (
+                <div>
+                  <p className="text-sm">{game.summary}</p>
                 </div>
+              )}
+            </div>
 
-                <p className="text-sm">Based on 537 critic reviews</p>
+            {/* Ratings Section */}
+            <div className="w-full md:w-auto md:self-center">
+              <div className="flex flex-row md:flex-col gap-6 md:gap-0 justify-around md:justify-start">
+                <div className="flex flex-col gap-1 items-center">
+                  <h4 className="text-lg md:text-xl text-center font-bold">
+                    Players score
+                  </h4>
+                  <div className="flex gap-2 md:gap-3 items-center">
+                    <Star
+                      className="fill-green-700 text-green-600"
+                      strokeWidth={1}
+                      size={36}
+                    />
+                    <span className="text-3xl md:text-4xl leading-none">
+                      {86 / 10}
+                    </span>
+                  </div>
+                  <p className="text-xs md:text-sm text-center">
+                    Based on 537 player reviews
+                  </p>
+                </div>
+                <div className="flex flex-col gap-1 items-center md:pt-12">
+                  <h4 className="text-lg md:text-xl text-center font-bold">
+                    Critics score
+                  </h4>
+                  <div className="flex gap-2 md:gap-3 items-center">
+                    <Star
+                      className="fill-orange-200 text-orange-100"
+                      strokeWidth={1}
+                      size={36}
+                    />
+                    <span className="text-3xl md:text-4xl leading-none">
+                      {86 / 10}
+                    </span>
+                  </div>
+                  <p className="text-xs md:text-sm text-center">
+                    Based on 537 critic reviews
+                  </p>
+                </div>
               </div>
             </div>
           </div>
         </main>
       )}
+      <div className="w-full h-1 bg-purple-600"></div>
       <ScreenshotCarousel images={screenshotUrls} />
-      <button onClick={fetchgame} className="mt-6 px-4 py-2 rounded border">
-        Pick another
-      </button>
     </>
   )
 }

@@ -24,7 +24,7 @@ export function GameCover({
           width,
           height,
         }}
-        className="flex items-center justify-center bg-neutral-800 text-white text-2xl rounded-lg"
+        className="flex items-center justify-center bg-neutral-800 text-white text-sm md:text-lg rounded-lg !w-[100px] !h-[150px] sm:!h-[250px]  sm:!w-[150px] md:!h-[450px] md:!w-[300px]"
       >
         {fallback}
       </div>
@@ -33,7 +33,7 @@ export function GameCover({
 
   return (
     <Image
-      className={`self-center !w-[300px] !h-[450px] rounded-lg`}
+      className={`self-center !w-[100px] !h-[150px] sm:!h-[250px]  sm:!w-[150px] md:!h-[450px] md:!w-[300px]  rounded-lg`}
       src={normalizeUrl(src as string)}
       alt={alt ?? 'IGDB cover'}
       loading={loading}
