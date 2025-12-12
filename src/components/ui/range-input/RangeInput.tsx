@@ -17,10 +17,10 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '../tooltip/Tooltip'
 
 export default function RangeInput({
   min = 0,
-  max = 100,
+  max = 10,
   step = 1,
   marks = {},
-  defaultValue = [20, 80],
+  defaultValue = [0, 10],
   value,
   onChange,
 }: RangeSliderProps) {

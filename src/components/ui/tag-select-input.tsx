@@ -45,7 +45,21 @@ export function TagSelectInput(props: TagSelectInputProps) {
     disabled = false,
   } = props
 
-  /** Build value → label map once per options change */
+  const isControlled = value !== undefined
+
+  const [internalTags, setInternalTags] = useState<Value[]>(defaultValue ?? [])
+
+  const selectedTags = (isControlled ? value : internalTags) ?? []
+
+  const [displayTags, setDisplayTags] = useState<string[]>([])
+  const [displayValue, setDisplayValue] = useState('')
+  const [isOpen, setIsOpen] = useState(false)
+
+  const inputRef = useRef<HTMLInputElement>(null)
+  const span = useRef<HTMLSpanElement>(null)
+  const containerRef = useRef<HTMLDivElement>(null)
+  const tagsContainerRef = useRef<HTMLDivElement>(null)
+
   const normalizedOptions = useMemo(() => {
     const entries: { label: string; value: Value }[] = []
     if (isGrouped(options)) {
@@ -62,38 +76,21 @@ export function TagSelectInput(props: TagSelectInputProps) {
     const foundOption = normalizedOptions.find(
       (option) => option.value === valueForSearch
     )
-    if (foundOption) {
-      return foundOption.label
-    } else {
-      return ''
-    }
+    return foundOption ? foundOption.label : ''
   }
 
-  const isControlled = value !== undefined
+  useEffect(() => {
+    setDisplayTags(selectedTags.map((el) => getLabelByValue(el)))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedTags, normalizedOptions])
 
-  const [tags, setTags] = useState<Value[]>(defaultValue ?? [])
-  const [displayTags, setDisplayTags] = useState<string[]>(
-    defaultValue ? defaultValue.map((el) => getLabelByValue(el)) : []
-  )
-
-  const [displayValue, setDisplayValue] = useState('')
-  const [isOpen, setIsOpen] = useState(false)
-
-  const inputRef = useRef<HTMLInputElement>(null)
-  const span = useRef<HTMLSpanElement>(null)
-  const containerRef = useRef<HTMLDivElement>(null)
-  const tagsContainerRef = useRef<HTMLDivElement>(null)
-
-  const updateTags = (tagsValue: Value[]) => {
-    if (isControlled) onChange?.(tags)
-    else {
-      setTags(tagsValue)
-      setDisplayTags(tagsValue.map((el) => getLabelByValue(el)))
-      onChange?.(tagsValue)
+  const updateTags = (nextTags: Value[]) => {
+    if (!isControlled) {
+      setInternalTags(nextTags)
     }
+    onChange?.(nextTags)
   }
 
-  /** FILTER OPTIONS based on displayValue (case-insensitive, matches text) */
   const filteredOptions: OptionsConfig = useMemo(() => {
     const q = displayValue.trim().toLowerCase()
     if (!q) return options
@@ -150,10 +147,9 @@ export function TagSelectInput(props: TagSelectInputProps) {
     role,
   ])
 
-  // Open the menu as the user types
   useEffect(() => {
     if (displayValue && !isOpen) setIsOpen(true)
-  }, [displayValue])
+  }, [displayValue, isOpen])
 
   useEffect(() => {
     const handleWindowBlur = () => {
@@ -197,7 +193,7 @@ export function TagSelectInput(props: TagSelectInputProps) {
           {displayValue}
         </span>
 
-        {!displayValue && tags.length === 0 && (
+        {!displayValue && selectedTags.length === 0 && (
           <span className="align-middle ms-2 opacity-25 absolute top-6/12 -translate-y-6/12">
             {placeholder}
           </span>
@@ -207,7 +203,9 @@ export function TagSelectInput(props: TagSelectInputProps) {
           <Tag
             tags={displayTags}
             removeTag={(indexToRemove: number) =>
-              updateTags(tags.filter((_, index) => index !== indexToRemove))
+              updateTags(
+                selectedTags.filter((_, index) => index !== indexToRemove)
+              )
             }
           />
         </div>
@@ -235,7 +233,7 @@ export function TagSelectInput(props: TagSelectInputProps) {
             setIsOpen(false)
             inputRef.current?.focus()
           }}
-          selectedValues={tags}
+          selectedValues={selectedTags}
           onClose={() => setIsOpen(false)}
           refs={refs}
           floatingStyles={getFloatingStylesForMenu(floatingStyles)}
@@ -261,11 +259,8 @@ function Tag(props: { tags: string[]; removeTag: (index: number) => void }) {
   }
 
   const transformLabel = (text: string) => {
-    if (text.length > 5) {
-      return normalize(text).substring(0, 5) + '...'
-    } else {
-      return normalize(text)
-    }
+    const t = normalize(text)
+    return t.length > 5 ? t.substring(0, 5) + '...' : t
   }
 
   return (
@@ -274,10 +269,10 @@ function Tag(props: { tags: string[]; removeTag: (index: number) => void }) {
         <span
           key={i}
           className={`bg-blue-500 px-[3px] py-[2px] text-[0.85rem] rounded-sm ${
-            i !== 0 && 'ms-2'
+            i !== 0 ? 'ms-2' : ''
           }`}
         >
-          {transformLabel(tag as string)}
+          {transformLabel(tag)}
           <span
             className="text-[0.65rem] cursor-pointer font-semibold ps-1"
             onClick={(event) => handleRemoveTag(event, i)}
@@ -288,10 +283,9 @@ function Tag(props: { tags: string[]; removeTag: (index: number) => void }) {
           </span>
         </span>
       ))}
+
       {tags.length > 2 && (
-        <span
-          className={`bg-blue-500 px-[3px] py-[2px] text-[0.85rem] rounded-sm ms-2`}
-        >
+        <span className="bg-blue-500 px-[3px] py-[2px] text-[0.85rem] rounded-sm ms-2">
           +{tags.length - 2}...
         </span>
       )}

@@ -1,36 +1,40 @@
 'use client'
 import { Card, CardBody, CardHeader } from '@/components/ui/card'
+import { GameCover } from '@/components/ui/game-cover/GameCover'
 import { Label } from '@/components/ui/label'
 import RangeInput from '@/components/ui/range-input/RangeInput'
+import { ScreenshotCarousel } from '@/components/ui/screenshot-carousel/ScreenshotCarousel'
 import { TagSelectInput } from '@/components/ui/tag-select-input'
 import {
   GAME_LEGACY_PLATFORMS,
   GAME_MODERN_PLATFORMS,
 } from '@/lib/constants/game-platforms'
 import { GENRES } from '@/lib/constants/genres'
-import { Game } from '@/types/game.types'
-import Image from 'next/image'
-import React, { useEffect, useState } from 'react'
-import Loading from './loading'
 import { IgdbGame } from '@/lib/igdb/igdb.types'
-import { normalizeUrl } from '@/lib/normalizeUrl'
-import { GameCover } from '@/components/ui/game-cover/GameCover'
-import { ScreenshotCarousel } from '@/components/ui/screenshot-carousel/ScreenshotCarousel'
-import { CircleStarIcon, Star, StarIcon } from 'lucide-react'
-import { size } from '@floating-ui/react'
+import { Star } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import Loading from './loading'
+import { useFormState } from '@/hooks/useFormState'
 
 export default function RandomPage() {
   const [game, setGame] = useState<IgdbGame | null>(null)
   const [screenshotUrls, setScreenshotUrls] = useState<string[]>([])
   const [isLoading, setLoading] = useState<boolean>(false)
+  const { form, setField, reset } = useFormState({
+    platforms: [] as (string | number | object)[],
+    genres: [] as (string | number | object)[],
+    userScore: [0, 10] as number[],
+    criticScore: [0, 10] as number[],
+  })
 
   const fetchgame = async () => {
     setLoading(true)
     return await fetch('/api/random-game', {
-      method: 'GET',
+      method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
+      body: JSON.stringify(form),
     })
       .then((res) => res.json())
       .then((data: IgdbGame) => {
@@ -72,6 +76,8 @@ export default function RandomPage() {
                       { label: 'Modern', options: [...GAME_MODERN_PLATFORMS] },
                       { label: 'Legacy', options: [...GAME_LEGACY_PLATFORMS] },
                     ]}
+                    value={form.platforms}
+                    onChange={(v) => setField('platforms', v)}
                   />
                 </div>
                 <div className="col-span-6">
@@ -80,24 +86,32 @@ export default function RandomPage() {
                     id="tag"
                     placeholder="Select Genres..."
                     options={[...GENRES]}
+                    value={form.genres}
+                    onChange={(v) => setField('genres', v)}
                   />
                 </div>
                 <div className="col-span-6">
                   <Label>User Score</Label>
                   <RangeInput
-                    marks={{ 0: '0', 50: '50', 100: '100' }}
-                    defaultValue={[0, 100]}
+                    marks={{ 0: '0', 5: '5', 10: '10' }}
+                    value={form.userScore}
+                    step={0.1}
+                    onChange={(v) => setField('userScore', v)}
                   />
                 </div>
                 <div className="col-span-6">
                   <Label>Critics Score</Label>
                   <RangeInput
-                    marks={{ 0: '0', 50: '50', 100: '100' }}
-                    defaultValue={[0, 100]}
+                    marks={{ 0: '0', 5: '5', 10: '10' }}
+                    value={form.criticScore}
+                    onChange={(v) => setField('criticScore', v)}
                   />
                 </div>
                 <div className="col-span-12 flex align-middle justify-center pt-6">
-                  <button className="rounded-2xl font-bold bg-gray-800 px-12 py-1">
+                  <button
+                    onClick={fetchgame}
+                    className="rounded-2xl font-bold bg-gray-800 px-12 py-1"
+                  >
                     Roll for game
                   </button>
                 </div>
@@ -171,7 +185,7 @@ export default function RandomPage() {
                 <path
                   d="M 0 60 Q 300 10, 600 60"
                   stroke="url(#arcGradient)"
-                  stroke-width="3"
+                  strokeWidth="3"
                   fill="none"
                 />
               </svg>
@@ -199,7 +213,11 @@ export default function RandomPage() {
               <div className="flex flex-col gap-1 items-center">
                 <h4 className="text-xl text-center font-bold">Players score</h4>
                 <div className="flex gap-3 items-center">
-                  <Star fill="green" className="text-green-700" size={48} />
+                  <Star
+                    className="fill-green-700 text-green-600"
+                    strokeWidth={1}
+                    size={48}
+                  />
                   <span className="text-4xl leading-none">{86 / 10}</span>
                 </div>
 
@@ -208,7 +226,11 @@ export default function RandomPage() {
               <div className="flex flex-col gap-1 items-center pt-12">
                 <h4 className="text-xl text-center font-bold">Critics score</h4>
                 <div className="flex gap-3 items-center">
-                  <Star fill="gold" className="text-orange-200" size={48} />
+                  <Star
+                    className="fill-orange-200 text-orange-100"
+                    strokeWidth={1}
+                    size={48}
+                  />
                   <span className="text-4xl leading-none">{86 / 10}</span>
                 </div>
 

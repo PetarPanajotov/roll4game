@@ -46,24 +46,35 @@ export class IgdbClient {
       offset ${offset};
     `
 
+    console.log(query)
+
     const res = await this.igdbGamesRequest(query)
     return res.json()
   }
 
-  public async getGamesCount(): Promise<Number> {
-    const res = await this.igdbGamesRequest('*;')
+  public async getGamesCount(where?: string): Promise<number> {
+    const query = `
+    fields id;
+    ${where ? `where ${where};` : ''}
+    limit 1;
+  `
 
-    if (!res.ok) {
-      const text = await res.text()
-      throw new Error(`IGDB count error: ${res.status} ${text}`)
-    }
-
+    const res = await this.igdbGamesRequest(query)
     return Number(res.headers.get('x-count') ?? 0)
   }
 
-  public async getRandomGame() {
-    const count = await this.getGamesCount()
-    const offset = Math.floor(Math.random() * Math.max(1, Number(count)))
-    return this.getGames({ offset, limit: 1 })
+  public async getRandomGame(opts?: { where?: string }) {
+    const where = opts?.where ?? ''
+    const count = await this.getGamesCount(where)
+
+    if (count <= 0) return []
+
+    const offset = Math.floor(Math.random() * count)
+
+    return this.getGames({
+      offset,
+      limit: 1,
+      where,
+    })
   }
 }
