@@ -5,18 +5,18 @@ import { Label } from '@/components/ui/label/Label'
 import RangeInput from '@/components/ui/range-input/RangeInput'
 import { ScreenshotCarousel } from '@/components/ui/screenshot-carousel/ScreenshotCarousel'
 import { TagSelectInput } from '@/components/ui/tag-select-input/TagSelectInput'
+import { useFormState } from '@/hooks/useFormState'
 import {
   GAME_LEGACY_PLATFORMS,
   GAME_MODERN_PLATFORMS,
 } from '@/lib/constants/game-platforms'
 import { GENRES } from '@/lib/constants/genres'
 import { IgdbGame } from '@/lib/igdb/igdb.types'
-import { Star } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import Loading from './loading'
-import { useFormState } from '@/hooks/useFormState'
-import { WhyDifferentCard } from './_components/WhyDifferentCard'
 import { Rating } from './_components/Rating'
+import { WhyDifferentCard } from './_components/WhyDifferentCard'
+import Loading from './loading'
+import { CurveSeparator } from '@/components/ui/curve-seperator/CurveSeperator'
 
 export default function RandomPage() {
   /*TODO: Refactor this component. It can be split into smaller ones. */
@@ -199,33 +199,7 @@ export default function RandomPage() {
                     </a>
                   )}
                 </div>
-                <svg
-                  className="separator"
-                  width="100%"
-                  height="60"
-                  viewBox="0 0 600 80"
-                  preserveAspectRatio="none"
-                >
-                  <defs>
-                    <linearGradient
-                      id="arcGradient"
-                      x1="0%"
-                      y1="0%"
-                      x2="100%"
-                      y2="0%"
-                    >
-                      <stop offset="0%" stopColor="#667eea" stopOpacity="1" />
-                      <stop offset="50%" stopColor="#764ba2" stopOpacity="1" />
-                      <stop offset="100%" stopColor="#f093fb" stopOpacity="1" />
-                    </linearGradient>
-                  </defs>
-                  <path
-                    d="M 0 60 Q 300 10, 600 60"
-                    stroke="url(#arcGradient)"
-                    strokeWidth="3"
-                    fill="none"
-                  />
-                </svg>
+                <CurveSeparator />
                 {game.genres && (
                   <p className="font-bold">
                     Genre:{' '}
@@ -251,33 +225,7 @@ export default function RandomPage() {
 
               {/* Mobile Summary Section */}
               <div className="w-full md:hidden space-y-3">
-                <svg
-                  className="separator"
-                  width="100%"
-                  height="40"
-                  viewBox="0 0 600 80"
-                  preserveAspectRatio="none"
-                >
-                  <defs>
-                    <linearGradient
-                      id="arcGradientMobile"
-                      x1="0%"
-                      y1="0%"
-                      x2="100%"
-                      y2="0%"
-                    >
-                      <stop offset="0%" stopColor="#667eea" stopOpacity="1" />
-                      <stop offset="50%" stopColor="#764ba2" stopOpacity="1" />
-                      <stop offset="100%" stopColor="#f093fb" stopOpacity="1" />
-                    </linearGradient>
-                  </defs>
-                  <path
-                    d="M 0 60 Q 300 10, 600 60"
-                    stroke="url(#arcGradientMobile)"
-                    strokeWidth="3"
-                    fill="none"
-                  />
-                </svg>
+                <CurveSeparator />
                 {game.genres && (
                   <p className="text-sm">
                     <span className="font-bold">Genre: </span>
