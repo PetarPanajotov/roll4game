@@ -1,10 +1,11 @@
 'use client'
+import Image from 'next/image'
 import Link from 'next/link'
 import { useState } from 'react'
 
 const links = [
   { href: '/', label: 'Home' },
-  { href: '/random', label: 'Random' },
+  { href: '/random', label: 'Random Game' },
   { href: '/list', label: 'My List' },
 ]
 
@@ -32,7 +33,22 @@ export default function Header() {
     <header className="border-b">
       <div className="mx-auto px-4 h-14 flex items-center justify-between">
         <Link href="/" className="font-semibold">
-          Roll4Game
+          <Image
+            className="hidden md:block h-auto w-[180px]"
+            width={180}
+            height={100}
+            src={'/roll4next-crop.png'}
+            alt="roll4next"
+            priority={true}
+          />
+          <Image
+            className="block md:hidden h-auto w-[55px]"
+            width={55}
+            height={30}
+            src={'/roll4next-dice-crop.png'}
+            alt="roll4next"
+            priority={true}
+          />
         </Link>
         <nav className="flex gap-4 sm:gap-14">
           <div className="flex gap-4 sm:gap-8 items-center">
@@ -46,7 +62,7 @@ export default function Header() {
               </Link>
             ))}
           </div>
-          <div className="flex gap-3 items-center">
+          {/* <div className="flex gap-3 items-center">
             {unauthorizedLinks.map((link) => (
               <Link
                 key={link.href}
@@ -59,7 +75,7 @@ export default function Header() {
                 {link.label}
               </Link>
             ))}
-          </div>
+          </div> */}
         </nav>
         <button
           className="text-2xl sm:hidden p-2"

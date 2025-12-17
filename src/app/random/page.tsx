@@ -15,6 +15,8 @@ import { Star } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import Loading from './loading'
 import { useFormState } from '@/hooks/useFormState'
+import { WhyDifferentCard } from './_components/WhyDifferentCard'
+import { Rating } from './_components/Rating'
 
 export default function RandomPage() {
   /*TODO: Refactor this component. It can be split into smaller ones. */
@@ -67,7 +69,7 @@ export default function RandomPage() {
           <Card className="max-w-2xl w-[100%] p-6 bg-black/92">
             <CardHeader>
               <h1 className="text-2xl font-semibold text-center mb-4">
-                Random Game Picker
+                Random Game Generator
               </h1>
             </CardHeader>
             <CardBody className="p-0">
@@ -128,226 +130,194 @@ export default function RandomPage() {
       </div>
       <div className="w-full h-1 bg-purple-600"></div>
       {game && (
-        <main
-          className="px-15 h-auto py-10 w-[100%] object-cover bg-top relative bg-no-repeat bg-cover before:absolute
+        <>
+          <main
+            className="px-15 h-auto py-10 w-[100%] object-cover bg-top relative bg-no-repeat bg-cover before:absolute
     before:inset-0            
     before:bg-black/70          
     before:z-0                
     before:content-['']"
-          style={{ backgroundImage: `url(${game.screenshots?.[0]?.url})` }}
-        >
-          <div className="flex flex-col md:flex-row justify-center items-start md:items-center relative z-10 gap-4 p-4">
-            {/* Game Cover and Title Section */}
-            <div className="flex gap-4 w-full md:w-auto">
-              <GameCover
-                src={game.cover?.url ?? ''}
-                width={game.cover?.width}
-                height={game.cover?.height}
-                alt={`${game.name} cover`}
-                className="w-24 h-auto md:w-auto"
-              />
-              <div className="flex flex-col justify-start md:hidden flex-1">
-                <h2 className="text-xl font-bold leading-tight">{game.name}</h2>
-                {game.first_release_date && (
-                  <p className="text-sm opacity-70 mt-1">
-                    {new Intl.DateTimeFormat('en-BG', {
-                      day: 'numeric',
-                      month: 'long',
-                      year: 'numeric',
-                    }).format(new Date(game.first_release_date * 1000))}
-                  </p>
-                )}
-                {game.url && (
-                  <a
-                    href={game.url}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="text-xs underline mt-1"
-                  >
-                    View on IGDB
-                  </a>
-                )}
-              </div>
-            </div>
-
-            {/* Desktop Title Section */}
-            <div className="hidden md:flex md:ps-8 flex-col md:w-[50%]">
-              <div>
-                <h2 className="text-3xl font-bold">{game.name}</h2>
-                {game.first_release_date && (
-                  <p className="text-lg opacity-70">
-                    {new Intl.DateTimeFormat('en-BG', {
-                      day: 'numeric',
-                      month: 'long',
-                      year: 'numeric',
-                    }).format(new Date(game.first_release_date * 1000))}
-                  </p>
-                )}
-                {game.url && (
-                  <a
-                    href={game.url}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="text-sm underline"
-                  >
-                    View on IGDB
-                  </a>
-                )}
-              </div>
-              <svg
-                className="separator"
-                width="100%"
-                height="60"
-                viewBox="0 0 600 80"
-                preserveAspectRatio="none"
-              >
-                <defs>
-                  <linearGradient
-                    id="arcGradient"
-                    x1="0%"
-                    y1="0%"
-                    x2="100%"
-                    y2="0%"
-                  >
-                    <stop offset="0%" stopColor="#667eea" stopOpacity="1" />
-                    <stop offset="50%" stopColor="#764ba2" stopOpacity="1" />
-                    <stop offset="100%" stopColor="#f093fb" stopOpacity="1" />
-                  </linearGradient>
-                </defs>
-                <path
-                  d="M 0 60 Q 300 10, 600 60"
-                  stroke="url(#arcGradient)"
-                  strokeWidth="3"
-                  fill="none"
+            style={{ backgroundImage: `url(${game.screenshots?.[0]?.url})` }}
+          >
+            <div className="flex flex-col md:flex-row justify-center items-start md:items-center relative z-10 gap-4 p-4">
+              {/* Game Cover and Title Section */}
+              <div className="flex gap-4 w-full md:w-auto">
+                <GameCover
+                  src={game.cover?.url ?? ''}
+                  width={game.cover?.width}
+                  height={game.cover?.height}
+                  alt={`${game.name} cover`}
+                  className="w-24 h-auto md:w-auto"
                 />
-              </svg>
-              {game.genres && (
-                <p className="font-bold">
-                  Genre:{' '}
-                  <span className="font-normal">
-                    {game.genres.map((genre) => genre.name).join(', ')}
-                  </span>
-                </p>
-              )}
-              {game.platforms && (
-                <p className="font-bold">
-                  Platforms:{' '}
-                  <span className="font-normal">
-                    {game.platforms.map((platform) => platform.name).join(', ')}
-                  </span>
-                </p>
-              )}
-              {game.summary && (
-                <p className="mt-4">{game.summary ?? 'No summary'}</p>
-              )}
-            </div>
+                <div className="flex flex-col justify-start md:hidden flex-1">
+                  <h2 className="text-xl font-bold leading-tight">
+                    {game.name}
+                  </h2>
+                  {game.first_release_date && (
+                    <p className="text-sm opacity-70 mt-1">
+                      {new Intl.DateTimeFormat('en-BG', {
+                        day: 'numeric',
+                        month: 'long',
+                        year: 'numeric',
+                      }).format(new Date(game.first_release_date * 1000))}
+                    </p>
+                  )}
+                  {game.url && (
+                    <a
+                      href={game.url}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-xs underline mt-1"
+                    >
+                      View on IGDB
+                    </a>
+                  )}
+                </div>
+              </div>
 
-            {/* Mobile Summary Section */}
-            <div className="w-full md:hidden space-y-3">
-              <svg
-                className="separator"
-                width="100%"
-                height="40"
-                viewBox="0 0 600 80"
-                preserveAspectRatio="none"
-              >
-                <defs>
-                  <linearGradient
-                    id="arcGradientMobile"
-                    x1="0%"
-                    y1="0%"
-                    x2="100%"
-                    y2="0%"
-                  >
-                    <stop offset="0%" stopColor="#667eea" stopOpacity="1" />
-                    <stop offset="50%" stopColor="#764ba2" stopOpacity="1" />
-                    <stop offset="100%" stopColor="#f093fb" stopOpacity="1" />
-                  </linearGradient>
-                </defs>
-                <path
-                  d="M 0 60 Q 300 10, 600 60"
-                  stroke="url(#arcGradientMobile)"
-                  strokeWidth="3"
-                  fill="none"
-                />
-              </svg>
-              {game.genres && (
-                <p className="text-sm">
-                  <span className="font-bold">Genre: </span>
-                  {game.genres.map((genre) => genre.name).join(', ')}
-                </p>
-              )}
-              {game.platforms && (
-                <p className="text-sm">
-                  <span className="font-bold">Platforms: </span>
-                  {game.platforms.map((platform) => platform.name).join(', ')}
-                </p>
-              )}
-              {game.summary && (
+              {/* Desktop Title Section */}
+              <div className="hidden md:flex md:ps-8 flex-col md:w-[50%]">
                 <div>
-                  <p className="text-sm">{game.summary}</p>
+                  <h2 className="text-3xl font-bold">{game.name}</h2>
+                  {game.first_release_date && (
+                    <p className="text-lg opacity-70">
+                      {new Intl.DateTimeFormat('en-BG', {
+                        day: 'numeric',
+                        month: 'long',
+                        year: 'numeric',
+                      }).format(new Date(game.first_release_date * 1000))}
+                    </p>
+                  )}
+                  {game.url && (
+                    <a
+                      href={game.url}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-sm underline"
+                    >
+                      View on IGDB
+                    </a>
+                  )}
                 </div>
-              )}
-            </div>
+                <svg
+                  className="separator"
+                  width="100%"
+                  height="60"
+                  viewBox="0 0 600 80"
+                  preserveAspectRatio="none"
+                >
+                  <defs>
+                    <linearGradient
+                      id="arcGradient"
+                      x1="0%"
+                      y1="0%"
+                      x2="100%"
+                      y2="0%"
+                    >
+                      <stop offset="0%" stopColor="#667eea" stopOpacity="1" />
+                      <stop offset="50%" stopColor="#764ba2" stopOpacity="1" />
+                      <stop offset="100%" stopColor="#f093fb" stopOpacity="1" />
+                    </linearGradient>
+                  </defs>
+                  <path
+                    d="M 0 60 Q 300 10, 600 60"
+                    stroke="url(#arcGradient)"
+                    strokeWidth="3"
+                    fill="none"
+                  />
+                </svg>
+                {game.genres && (
+                  <p className="font-bold">
+                    Genre:{' '}
+                    <span className="font-normal">
+                      {game.genres.map((genre) => genre.name).join(', ')}
+                    </span>
+                  </p>
+                )}
+                {game.platforms && (
+                  <p className="font-bold">
+                    Platforms:{' '}
+                    <span className="font-normal">
+                      {game.platforms
+                        .map((platform) => platform.name)
+                        .join(', ')}
+                    </span>
+                  </p>
+                )}
+                {game.summary && (
+                  <p className="mt-4">{game.summary ?? 'No summary'}</p>
+                )}
+              </div>
 
-            {/* TODO: Hardcoded Ratings Section */}
-            <div className="w-full md:w-auto md:self-center">
-              <div className="flex flex-row md:flex-col gap-6 md:gap-0 justify-around md:justify-start">
-                <div className="flex flex-col gap-1 items-center">
-                  <h4 className="text-lg md:text-xl text-center font-bold">
-                    Players score
-                  </h4>
-                  <div className="flex gap-2 md:gap-3 items-center">
-                    <Star
-                      className="fill-green-700 text-green-600"
-                      strokeWidth={1}
-                      size={36}
-                    />
-                    <span className="text-3xl md:text-4xl leading-none">
-                      {game.rating ? (game.rating / 10).toFixed(1) : 'NaN'}
-                    </span>
-                  </div>
-                  <p className="text-xs md:text-sm text-center">
-                    Based on{' '}
-                    <span className="font-bold underline">
-                      {game.rating_count ?? 0}
-                    </span>{' '}
-                    player reviews
+              {/* Mobile Summary Section */}
+              <div className="w-full md:hidden space-y-3">
+                <svg
+                  className="separator"
+                  width="100%"
+                  height="40"
+                  viewBox="0 0 600 80"
+                  preserveAspectRatio="none"
+                >
+                  <defs>
+                    <linearGradient
+                      id="arcGradientMobile"
+                      x1="0%"
+                      y1="0%"
+                      x2="100%"
+                      y2="0%"
+                    >
+                      <stop offset="0%" stopColor="#667eea" stopOpacity="1" />
+                      <stop offset="50%" stopColor="#764ba2" stopOpacity="1" />
+                      <stop offset="100%" stopColor="#f093fb" stopOpacity="1" />
+                    </linearGradient>
+                  </defs>
+                  <path
+                    d="M 0 60 Q 300 10, 600 60"
+                    stroke="url(#arcGradientMobile)"
+                    strokeWidth="3"
+                    fill="none"
+                  />
+                </svg>
+                {game.genres && (
+                  <p className="text-sm">
+                    <span className="font-bold">Genre: </span>
+                    {game.genres.map((genre) => genre.name).join(', ')}
                   </p>
-                </div>
-                <div className="flex flex-col gap-1 items-center md:pt-12">
-                  <h4 className="text-lg md:text-xl text-center font-bold">
-                    Critics score
-                  </h4>
-                  <div className="flex gap-2 md:gap-3 items-center">
-                    <Star
-                      className="fill-orange-200 text-orange-100"
-                      strokeWidth={1}
-                      size={36}
-                    />
-                    <span className="text-3xl md:text-4xl leading-none">
-                      {game.aggregated_rating
-                        ? (game.aggregated_rating / 10).toFixed(1)
-                        : 'NaN'}
-                    </span>
-                  </div>
-                  <p className="text-xs md:text-sm text-center">
-                    Based on{' '}
-                    <span className="font-bold underline">
-                      {game.aggregated_rating_count ?? 0}
-                    </span>{' '}
-                    critic reviews
+                )}
+                {game.platforms && (
+                  <p className="text-sm">
+                    <span className="font-bold">Platforms: </span>
+                    {game.platforms.map((platform) => platform.name).join(', ')}
                   </p>
-                </div>
+                )}
+                {game.summary && (
+                  <div>
+                    <p className="text-sm">{game.summary}</p>
+                  </div>
+                )}
+              </div>
+              <div className="w-full md:w-auto md:self-center">
+                <Rating
+                  rating={game.rating}
+                  rating_count={game.rating_count}
+                  aggregated_rating={game.aggregated_rating}
+                  aggregated_rating_count={game.aggregated_rating_count}
+                />
               </div>
             </div>
-          </div>
-        </main>
+          </main>
+        </>
+      )}
+      {!game && (
+        <div className="h-52 flex items-center justify-center">
+          <h3 className="text-3xl opacity-50">No game generated yet</h3>
+        </div>
       )}
       <div className="w-full h-1 bg-purple-600"></div>
       {screenshotUrls.length > 0 && (
         <ScreenshotCarousel images={screenshotUrls} />
       )}
+      <WhyDifferentCard />
     </>
   )
 }
