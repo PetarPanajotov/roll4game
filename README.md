@@ -6,7 +6,7 @@ Roll4Next is a discovery platform designed to help you decide **what’s next**�
 
 🚀 **Live Deployment:** [https://roll4game.vercel.app/](https://roll4game.vercel.app/)
 
-> [!IMPORTANT] > **Domain Migration Notice:** We are currently rebranding from **Roll4Game** to **Roll4Next**. The URL above is currently active, but it will be migrating to a new **roll4next** domain shortly to align with our expanded scope.
+> [!IMPORTANT] > **Domain Migration Notice:** I currently rebranding from **Roll4Game** to **Roll4Next**. The URL above is currently active, but it will be migrating to a new **roll4next** domain shortly to align with our expanded scope.
 
 ---
 
