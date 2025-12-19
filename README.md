@@ -1,36 +1,39 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Roll4Next 🎲
 
-## Getting Started
+**Stop scrolling. Start rolling.**
 
-First, run the development server:
+Roll4Next is a discovery platform designed to help you decide **what’s next**—whether that’s a video game, TV show, film, or board game. In an era of infinite choice and "scroll paralysis," Roll4Next focuses on **choice reduction**, giving you a curated starting point instead of an endless list.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+🚀 **Live Deployment:** [https://roll4game.vercel.app/](https://roll4game.vercel.app/)
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+> [!IMPORTANT] > **Domain Migration Notice:** We are currently rebranding from **Roll4Game** to **Roll4Next**. The URL above is currently active, but it will be migrating to a new **roll4next** domain shortly to align with our expanded scope.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 🎯 The Mission
 
-## Learn More
+Modern entertainment platforms provide too many options, leading to decision fatigue. Roll4Next restores the excitement of discovery by making each "roll" feel intentional.
 
-To learn more about Next.js, take a look at the following resources:
+Instead of browsing through algorithms designed to keep you scrolling, you roll the dice—and something new finds you.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Current & Planned Categories
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- 🎮 **Video Games:** From AAA blockbusters to indie darlings.
+- 📺 **TV Shows:** Your next weekend binge-watch.
+- 🎬 **Films:** Cinematic experiences for any mood.
+- 🎲 **Board Games:** Tabletop adventures for your next game night.
+- 🧩 **Future Growth:** Expanding into digital and physical entertainment categories.
 
-## Deploy on Vercel
+---
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 🛠 Tech Stack
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+The project is built with a focus on speed, type safety, and a seamless responsive UI:
+
+- **Framework:** Next.js
+- **Language:** TypeScript
+- **UI/Styling:** React & Tailwind CSS
+- **Data Sources:** External media APIs (IGDB, movie & TV data providers)
+- **Deployment:** Vercel
+
+---

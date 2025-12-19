@@ -3,10 +3,11 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useState } from 'react'
 
+import { Gochi_Hand } from 'next/font/google'
+
 const links = [
   { href: '/', label: 'Home' },
   { href: '/random', label: 'Random Game' },
-  { href: '/list', label: 'My List' },
 ]
 
 const unauthorizedLinks = [
@@ -24,31 +25,34 @@ const unauthorizedLinks = [
   },
 ]
 
+const gochiHand = Gochi_Hand({
+  weight: '400',
+  subsets: ['latin'],
+})
+
 const authorizedLinks = [{ href: '/logout', label: 'Logout' }]
 
 export default function Header() {
   const [open, setOpen] = useState(false)
 
   return (
-    <header className="border-b">
+    <header className="border-b bg-black">
       <div className="mx-auto px-4 h-14 flex items-center justify-between">
-        <Link href="/" className="font-semibold">
+        <Link href="/" className="font-semibold flex items-center gap-2">
+          {/* TODO: Create component Roll4Next branding and move Image + text inside it */}
           <Image
-            className="hidden md:block h-auto w-[180px]"
-            width={180}
-            height={100}
-            src={'/roll4next-crop.png'}
+            className="h-auto"
+            width={65}
+            height={65}
+            src={'/dice-transperant_v1.png'}
             alt="roll4next"
             priority={true}
           />
-          <Image
-            className="block md:hidden h-auto w-[55px]"
-            width={55}
-            height={30}
-            src={'/roll4next-dice-crop.png'}
-            alt="roll4next"
-            priority={true}
-          />
+          <span
+            className={`${gochiHand.className} hidden md:inline text-2xl md:text-3xl pt-1 font-bold bg-gradient-to-r from-[#8b2cf5] via-[#6067eb] to-[#059dcf] bg-clip-text text-transparent`}
+          >
+            Roll4Next
+          </span>
         </Link>
         <nav className="flex gap-4 sm:gap-14">
           <div className="flex gap-4 sm:gap-8 items-center">
@@ -62,30 +66,9 @@ export default function Header() {
               </Link>
             ))}
           </div>
-          {/* <div className="flex gap-3 items-center">
-            {unauthorizedLinks.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className={
-                  'font-bold text-[11px] px-2.5 py-1 sm:text-sm sm:px-5 sm:py-1.5 ' +
-                  link.class
-                }
-              >
-                {link.label}
-              </Link>
-            ))}
-          </div> */}
         </nav>
-        <button
-          className="text-2xl sm:hidden p-2"
-          onClick={() => setOpen(true)}
-        >
-          ☰
-        </button>
       </div>
-      {/* Mobile Aside Menu */}
-      <div
+      {/* <div
         className={`fixed top-0 right-0 h-full w-64 bg-[#171717] shadow-lg transform transition-transform ${
           open ? 'translate-x-0' : 'translate-x-full'
         }`}
@@ -105,7 +88,7 @@ export default function Header() {
             </Link>
           ))}
         </nav>
-      </div>
+      </div> */}
     </header>
   )
 }

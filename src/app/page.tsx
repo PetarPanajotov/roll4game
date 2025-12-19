@@ -1,103 +1,180 @@
-import Image from "next/image";
+'use client'
+import {
+  Card,
+  CardBody,
+  CardFooter,
+  CardHeader,
+} from '@/components/ui/card/Card'
+import { CurveSeparator } from '@/components/ui/curve-seperator/CurveSeperator'
+import { Dice3, Star, Zap } from 'lucide-react'
+import Image from 'next/image'
+import Link from 'next/link'
+import { useRef } from 'react'
 
 export default function Home() {
-  return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const categorySectionRef = useRef<HTMLDivElement>(null)
+  /** TODO: Metadata are missing, as the component is 'use client'. They will be added in incoming days */
+  const features = [
+    { icon: Zap, text: 'Instant recommendations' },
+    { icon: Star, text: 'Curated from top sources' },
+    { icon: Dice3, text: 'Endless possibilities' },
+  ]
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+  const scrollToCategories = () => {
+    categorySectionRef.current?.scrollIntoView({
+      behavior: 'smooth',
+      block: 'start',
+    })
+  }
+
+  return (
+    <div className="min-h-screen container mx-auto overflow-hidden">
+      <section className="relative pt-15 pb-15 px-6">
+        <div className="max-w-5xl mx-auto text-center">
+          <div className="mb-8 inline-block">
+            <div className="relative mb-8 inline-block">
+              <div className="relative">
+                {/* The Dice Image */}
+                <Image
+                  src={'/dice-transperant_v2.png'}
+                  width={250}
+                  height={250}
+                  className="relative z-10"
+                  alt="dice-brand"
+                />
+
+                {/* High-Visibility Shadow */}
+                <div className="absolute -bottom-10 left-1/2 -translate-x-1/2 w-48 h-8 z-0">
+                  {/* Inner White Core (Gives the white dice a base) */}
+                  <div className="absolute inset-0 bg-white/10 blur-xl rounded-[100%]" />
+                  {/* Outer Blue Glow (Adds the brand color) */}
+                  <div className="absolute inset-0 bg-blue-500/20 blur-2xl rounded-[100%] scale-150" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <h1 className="text-7xl md:text-8xl font-bold mb-6 leading-tight tracking-tight">
+            Can't Decide?
+            <br />
+            <span className="text-blue-400">Just Roll</span>
+          </h1>
+
+          <p className="text-xl md:text-2xl text-gray-400 mb-12 max-w-2xl mx-auto">
+            Let fate choose your next obsession. Random games, TV shows, movies,
+            and more — because sometimes the best discoveries are unexpected.
+          </p>
+
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16">
+            <button
+              onClick={scrollToCategories}
+              className="group px-8 py-4 bg-white text-black rounded-full font-semibold text-lg hover:bg-gray-100 transition-all duration-200 flex items-center gap-2 cursor-pointer"
+            >
+              Start Rolling
+            </button>
+            <button className="px-8 py-4 bg-transparent border border-white/20 text-white rounded-full font-semibold text-lg hover:bg-white/5 transition-all duration-200">
+              Learn More
+            </button>
+          </div>
+
+          {/* Features Pills */}
+          <div className="flex flex-wrap gap-3 justify-center">
+            {features.map((feature, i) => (
+              <div
+                key={i}
+                className="flex items-center gap-2 px-4 py-2 bg-white/5 rounded-full border border-white/10 text-sm text-gray-300"
+              >
+                <feature.icon className="w-4 h-4 text-blue-400" />
+                <span>{feature.text}</span>
+              </div>
+            ))}
+          </div>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+        <div ref={categorySectionRef} className="py-5">
+          <CurveSeparator />
+
+          <h2 className="text-[3rem] text-center font-bold">
+            What Should You Roll?
+          </h2>
+
+          {/*TODO: Refactor - extract card component to reduce duplication
+           *REFACTOR: Create reusable CategoryCard component
+           *FIXME: Too much repetition, needs component extraction
+           */}
+          <div className="grid grid-cols-12 gap-8 pt-10">
+            <Link href="/random" className="col-span-3">
+              <Card className="col-span-3 border-indigo-400 border-t-indigo-400/90 border-t-10 p-10 cursor-pointer transition-transform duration-300 hover:scale-105 hover:shadow-lg hover:shadow-indigo-500/40">
+                <CardHeader className="flex items-center">
+                  <span className="text-6xl">🎮</span>
+                  <h3 className="text-3xl pt-5 font-bold">Games</h3>
+                </CardHeader>
+                <CardBody>
+                  <p className="text-gray-400 text-center">
+                    Discover your next gaming obsession from thousands of titles
+                    powered by IGDB
+                  </p>
+                </CardBody>
+                <CardFooter className="flex items-center justify-center">
+                  {/* TODO: Create Button Component */}
+                  <button className="border border-indigo-400/40 rounded-full px-5 py-2 bg-indigo-600/20 text-indigo-200 font-bold">
+                    Visit Page
+                  </button>
+                </CardFooter>
+              </Card>
+            </Link>
+            <Card className="col-span-3 border-indigo-400 opacity-50 p-10 cursor-pointer transition-transform duration-300 hover:scale-105 hover:shadow-lg hover:shadow-indigo-500/40 pointer-events-none">
+              <CardHeader className="flex items-center">
+                <span className="text-6xl">🎬</span>
+                <h3 className="text-3xl pt-5 font-bold">Movies</h3>
+              </CardHeader>
+              <CardBody>
+                <p className="text-gray-400 text-center">
+                  Roll the dice on your next movie night pick
+                </p>
+              </CardBody>
+              <CardFooter className="flex items-center justify-center">
+                {/* TODO: Create Button Component */}
+                <button className="border border-amber-400 rounded-full px-5 py-2 bg-amber-600/40 text-indigo-200 font-bold">
+                  🎲 Rolling soon
+                </button>
+              </CardFooter>
+            </Card>
+            <Card className="col-span-3 border-indigo-400 opacity-50 p-10 cursor-pointer transition-transform duration-300 hover:scale-105 hover:shadow-lg hover:shadow-indigo-500/40 pointer-events-none">
+              <CardHeader className="flex items-center">
+                <span className="text-6xl">📺</span>
+                <h3 className="text-3xl pt-5 font-bold">TV Show</h3>
+              </CardHeader>
+              <CardBody>
+                <p className="text-gray-400 text-center">
+                  Find the perfect series to binge-watch this weekend
+                </p>
+              </CardBody>
+              <CardFooter className="flex items-center justify-center">
+                <button className="border border-amber-400 rounded-full px-5 py-2 bg-amber-600/40 text-indigo-200 font-bold">
+                  🎲 Rolling soon
+                </button>
+              </CardFooter>
+            </Card>
+            <Card className="col-span-3 border-indigo-400 opacity-50 p-10 cursor-pointer transition-transform duration-300 hover:scale-105 hover:shadow-lg hover:shadow-indigo-500/40 pointer-events-none">
+              <CardHeader className="flex items-center">
+                <span className="text-6xl">🎲</span>
+                <h3 className="text-3xl pt-5 font-bold">Board Game</h3>
+              </CardHeader>
+              <CardBody>
+                <p className="text-gray-400 text-center">
+                  Discover exciting tabletop adventures for your next game night
+                </p>
+              </CardBody>
+              <CardFooter className="flex items-center justify-center">
+                {/* TODO: Create Button Component */}
+                <button className="border border-amber-400 rounded-full px-5 py-2 bg-amber-600/40 text-indigo-200 font-bold">
+                  🎲 Rolling soon
+                </button>
+              </CardFooter>
+            </Card>
+          </div>
+        </div>
+      </section>
     </div>
-  );
+  )
 }
