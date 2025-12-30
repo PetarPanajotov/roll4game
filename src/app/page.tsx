@@ -1,4 +1,5 @@
 'use client'
+import { Button } from '@/components/ui/button/Button'
 import {
   Card,
   CardBody,
@@ -116,9 +117,9 @@ export default function Home() {
                 </CardBody>
                 <CardFooter className="flex items-center justify-center">
                   {/* TODO: Create Button Component */}
-                  <button className="border border-indigo-400/40 rounded-full px-5 py-2 bg-indigo-600/20 text-indigo-200 font-bold">
+                  <Button variant="secondaryLight" size="lg">
                     Visit Page
-                  </button>
+                  </Button>
                 </CardFooter>
               </Card>
             </Link>
