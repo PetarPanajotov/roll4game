@@ -9,6 +9,7 @@ import { Rating } from './_components/Rating'
 import { WhyDifferentCard } from './_components/WhyDifferentCard'
 import Loading from './loading'
 import { GameTitle } from './_components/GameTitle'
+import { GameMetadata } from './_components/GameMetadata'
 
 export default function RandomPage() {
   /*TODO: Refactor this component. It can be split into smaller ones. */
@@ -93,24 +94,7 @@ export default function RandomPage() {
                   url={game.url}
                 />
                 <CurveSeparator />
-                {game.genres && (
-                  <p className="font-bold">
-                    Genre:{' '}
-                    <span className="font-normal">
-                      {game.genres.map((genre) => genre.name).join(', ')}
-                    </span>
-                  </p>
-                )}
-                {game.platforms && (
-                  <p className="font-bold">
-                    Platforms:{' '}
-                    <span className="font-normal">
-                      {game.platforms
-                        .map((platform) => platform.name)
-                        .join(', ')}
-                    </span>
-                  </p>
-                )}
+                <GameMetadata genres={game.genres} platforms={game.platforms} />
                 {game.summary && (
                   <p className="mt-4">{game.summary ?? 'No summary'}</p>
                 )}
@@ -119,18 +103,7 @@ export default function RandomPage() {
               {/* Mobile Summary Section */}
               <div className="w-full md:hidden space-y-3">
                 <CurveSeparator />
-                {game.genres && (
-                  <p className="text-sm">
-                    <span className="font-bold">Genre: </span>
-                    {game.genres.map((genre) => genre.name).join(', ')}
-                  </p>
-                )}
-                {game.platforms && (
-                  <p className="text-sm">
-                    <span className="font-bold">Platforms: </span>
-                    {game.platforms.map((platform) => platform.name).join(', ')}
-                  </p>
-                )}
+                <GameMetadata genres={game.genres} platforms={game.platforms} />
                 {game.summary && (
                   <div>
                     <p className="text-sm">{game.summary}</p>
