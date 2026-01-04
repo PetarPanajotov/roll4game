@@ -8,6 +8,7 @@ import { FilterCard, FilterFormData } from './_components/FilterCard'
 import { Rating } from './_components/Rating'
 import { WhyDifferentCard } from './_components/WhyDifferentCard'
 import Loading from './loading'
+import { GameTitle } from './_components/GameTitle'
 
 export default function RandomPage() {
   /*TODO: Refactor this component. It can be split into smaller ones. */
@@ -75,56 +76,22 @@ export default function RandomPage() {
                   alt={`${game.name} cover`}
                   className="w-24 h-auto md:w-auto"
                 />
-                <div className="flex flex-col justify-start md:hidden flex-1">
-                  <h2 className="text-xl font-bold leading-tight">
-                    {game.name}
-                  </h2>
-                  {game.first_release_date && (
-                    <p className="text-sm opacity-70 mt-1">
-                      {new Intl.DateTimeFormat('en-BG', {
-                        day: 'numeric',
-                        month: 'long',
-                        year: 'numeric',
-                      }).format(new Date(game.first_release_date * 1000))}
-                    </p>
-                  )}
-                  {game.url && (
-                    <a
-                      href={game.url}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="text-xs underline mt-1"
-                    >
-                      View on IGDB
-                    </a>
-                  )}
+                <div className="md:hidden">
+                  <GameTitle
+                    name={game.name}
+                    releaseDate={game.first_release_date}
+                    url={game.url}
+                  />
                 </div>
               </div>
 
               {/* Desktop Title Section */}
               <div className="hidden md:flex md:ps-8 flex-col md:w-[50%]">
-                <div>
-                  <h2 className="text-3xl font-bold">{game.name}</h2>
-                  {game.first_release_date && (
-                    <p className="text-lg opacity-70">
-                      {new Intl.DateTimeFormat('en-BG', {
-                        day: 'numeric',
-                        month: 'long',
-                        year: 'numeric',
-                      }).format(new Date(game.first_release_date * 1000))}
-                    </p>
-                  )}
-                  {game.url && (
-                    <a
-                      href={game.url}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="text-sm underline"
-                    >
-                      View on IGDB
-                    </a>
-                  )}
-                </div>
+                <GameTitle
+                  name={game.name}
+                  releaseDate={game.first_release_date}
+                  url={game.url}
+                />
                 <CurveSeparator />
                 {game.genres && (
                   <p className="font-bold">
