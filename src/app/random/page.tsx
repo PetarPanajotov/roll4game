@@ -1,36 +1,21 @@
 'use client'
-import { Card, CardBody, CardHeader } from '@/components/ui/card/Card'
+import { CurveSeparator } from '@/components/ui/curve-seperator/CurveSeperator'
 import { GameCover } from '@/components/ui/game-cover/GameCover'
-import { Label } from '@/components/ui/label/Label'
-import RangeInput from '@/components/ui/range-input/RangeInput'
 import { ScreenshotCarousel } from '@/components/ui/screenshot-carousel/ScreenshotCarousel'
-import { TagSelectInput } from '@/components/ui/tag-select-input/TagSelectInput'
-import { useFormState } from '@/hooks/useFormState'
-import {
-  GAME_LEGACY_PLATFORMS,
-  GAME_MODERN_PLATFORMS,
-} from '@/lib/constants/game-platforms'
-import { GENRES } from '@/lib/constants/genres'
 import { IgdbGame } from '@/lib/igdb/igdb.types'
 import { useEffect, useState } from 'react'
+import { FilterCard, FilterFormData } from './_components/FilterCard'
 import { Rating } from './_components/Rating'
 import { WhyDifferentCard } from './_components/WhyDifferentCard'
 import Loading from './loading'
-import { CurveSeparator } from '@/components/ui/curve-seperator/CurveSeperator'
 
 export default function RandomPage() {
   /*TODO: Refactor this component. It can be split into smaller ones. */
   const [game, setGame] = useState<IgdbGame | null>(null)
   const [screenshotUrls, setScreenshotUrls] = useState<string[]>([])
   const [isLoading, setLoading] = useState<boolean>(false)
-  const { form, setField, reset } = useFormState({
-    platforms: [] as (string | number | object)[],
-    genres: [] as (string | number | object)[],
-    userScore: [0, 10] as number[],
-    criticScore: [0, 10] as number[],
-  })
 
-  const fetchgame = async () => {
+  const fetchgame = async (form: FilterFormData) => {
     setLoading(true)
     return await fetch('/api/random-game', {
       method: 'POST',
@@ -66,69 +51,10 @@ export default function RandomPage() {
     before:content-['']"
       >
         <div className="relative z-2 flex justify-center align items-center h-[100%] w-[100%]">
-          <Card className="max-w-2xl w-[100%] p-6 bg-black/92">
-            <CardHeader>
-              <h1 className="text-2xl font-semibold text-center mb-4">
-                Random Game Generator
-              </h1>
-            </CardHeader>
-            <CardBody className="p-0">
-              <div className="grid grid-cols-12 gap-4">
-                <div className="col-span-12 md:col-span-6">
-                  <Label htmlFor="tag">Platform</Label>
-                  <TagSelectInput
-                    id="tag"
-                    placeholder="Select platforms..."
-                    options={[
-                      { label: 'Modern', options: [...GAME_MODERN_PLATFORMS] },
-                      { label: 'Legacy', options: [...GAME_LEGACY_PLATFORMS] },
-                    ]}
-                    value={form.platforms}
-                    onChange={(v) => setField('platforms', v)}
-                  />
-                </div>
-                <div className="col-span-12 md:col-span-6">
-                  <Label htmlFor="tag">Genres</Label>
-                  <TagSelectInput
-                    id="tag"
-                    placeholder="Select Genres..."
-                    options={[...GENRES]}
-                    value={form.genres}
-                    onChange={(v) => setField('genres', v)}
-                  />
-                </div>
-                <div className="col-span-12 md:col-span-6">
-                  <Label>User Score</Label>
-                  <RangeInput
-                    marks={{ 0: '0', 5: '5', 10: '10' }}
-                    value={form.userScore}
-                    step={0.1}
-                    onChange={(v) => setField('userScore', v)}
-                  />
-                </div>
-                <div className="col-span-12 md:col-span-6">
-                  <Label>Critics Score</Label>
-                  <RangeInput
-                    marks={{ 0: '0', 5: '5', 10: '10' }}
-                    value={form.criticScore}
-                    step={0.1}
-                    onChange={(v) => setField('criticScore', v)}
-                  />
-                </div>
-                <div className="col-span-12 flex align-middle justify-center pt-6">
-                  <button
-                    onClick={fetchgame}
-                    className="rounded-2xl font-bold bg-gray-800 px-12 py-1 cursor-pointer"
-                  >
-                    Roll for game
-                  </button>
-                </div>
-              </div>
-            </CardBody>
-          </Card>
+          <FilterCard onRollClick={fetchgame} />
         </div>
       </div>
-      <div className="w-full h-1 bg-purple-600"></div>
+      <div className="w-full h-1 bg-primary"></div>
       {game && (
         <>
           <main
@@ -261,7 +187,7 @@ export default function RandomPage() {
           <h3 className="text-3xl opacity-50">No game generated yet</h3>
         </div>
       )}
-      <div className="w-full h-1 bg-purple-600"></div>
+      <div className="w-full h-1 bg-primary"></div>
       {screenshotUrls.length > 0 && (
         <ScreenshotCarousel images={screenshotUrls} />
       )}
