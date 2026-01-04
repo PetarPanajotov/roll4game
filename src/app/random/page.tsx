@@ -10,6 +10,7 @@ import { WhyDifferentCard } from './_components/WhyDifferentCard'
 import Loading from './loading'
 import { GameTitle } from './_components/GameTitle'
 import { GameMetadata } from './_components/GameMetadata'
+import { GameSummary } from './_components/GameSummary'
 
 export default function RandomPage() {
   /*TODO: Refactor this component. It can be split into smaller ones. */
@@ -94,22 +95,23 @@ export default function RandomPage() {
                   url={game.url}
                 />
                 <CurveSeparator />
-                <GameMetadata genres={game.genres} platforms={game.platforms} />
-                {game.summary && (
-                  <p className="mt-4">{game.summary ?? 'No summary'}</p>
-                )}
+                <div className="flex flex-col gap-2">
+                  <GameMetadata
+                    genres={game.genres}
+                    platforms={game.platforms}
+                  />
+                  <GameSummary summary={game.summary} />
+                </div>
               </div>
 
               {/* Mobile Summary Section */}
               <div className="w-full md:hidden space-y-3">
                 <CurveSeparator />
                 <GameMetadata genres={game.genres} platforms={game.platforms} />
-                {game.summary && (
-                  <div>
-                    <p className="text-sm">{game.summary}</p>
-                  </div>
-                )}
+                <GameSummary summary={game.summary} />
               </div>
+
+              {/* Rating for both views */}
               <div className="w-full md:w-auto md:self-center">
                 <Rating
                   rating={game.rating}
