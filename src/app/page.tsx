@@ -103,7 +103,7 @@ export default function Home() {
            *FIXME: Too much repetition, needs component extraction
            */}
           <div className="grid grid-cols-12 gap-8 pt-10">
-            <Link href="/random" className="col-span-12 lg:col-span-3">
+            <Link href="/random-game" className="col-span-12 lg:col-span-3">
               <Card className="col-span-3 border-indigo-400 border-t-indigo-400/90 border-t-10 p-10 cursor-pointer transition-transform duration-300 hover:scale-105 hover:shadow-lg hover:shadow-indigo-500/40">
                 <CardHeader className="flex items-center">
                   <span className="text-6xl">🎮</span>

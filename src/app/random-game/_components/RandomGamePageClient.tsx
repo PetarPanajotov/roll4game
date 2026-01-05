@@ -128,9 +128,12 @@ export function RandomGamePageClient() {
       ) : (
         !isPending &&
         !error && (
-          <div className="h-52 flex items-center justify-center">
-            <h3 className="text-3xl opacity-50">No game generated yet</h3>
-          </div>
+          <>
+            <div className="h-52 flex items-center justify-center">
+              <h3 className="text-3xl opacity-50">No game generated yet</h3>
+            </div>
+            <div className="w-full h-1 bg-primary" />
+          </>
         )
       )}
     </>

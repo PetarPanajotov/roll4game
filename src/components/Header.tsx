@@ -7,7 +7,7 @@ import { Gochi_Hand } from 'next/font/google'
 
 const links = [
   { href: '/', label: 'Home' },
-  { href: '/random', label: 'Random Game' },
+  { href: '/random-game', label: 'Random Game' },
 ]
 
 const unauthorizedLinks = [
